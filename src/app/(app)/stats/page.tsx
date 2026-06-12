@@ -1,5 +1,6 @@
 import { getDataDb } from "@/lib/data";
 import { StatsDashboard } from "@/components/stats/stats-dashboard";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +15,11 @@ export default async function StatsPage() {
     : [];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Cycle Statistics</h2>
-        <p className="text-slate-500">
-          Overall health of your new grad application cycle.
-        </p>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        title="Stats"
+        description="Overall health of your new grad application cycle."
+      />
       <StatsDashboard applications={applications} />
     </div>
   );

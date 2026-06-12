@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 type Listing = {
@@ -87,22 +87,27 @@ export function JobsBoard({ listings }: JobsBoardProps) {
   if (listings.length === 0) {
     return (
       <Card>
-        <CardContent className="py-12 text-center text-slate-500">
-          No active new-grad openings yet. Run a scan to check target companies.
+        <CardContent className="py-16 text-center">
+          <p className="text-sm text-[var(--muted)]">
+            No active new-grad openings yet.
+          </p>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Run a scan to check target companies.
+          </p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <div className="space-y-5">
+      <div className="space-y-3">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
             Company
           </label>
           <select
-            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm"
+            className="h-11 min-h-[44px] w-full appearance-none rounded-[var(--radius-sm)] border border-black/[0.08] bg-white px-3.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10"
             value={companyFilter}
             onChange={(event) => setCompanyFilter(event.target.value)}
           >
@@ -115,7 +120,7 @@ export function JobsBoard({ listings }: JobsBoardProps) {
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
             Location
           </label>
           <Input
@@ -127,53 +132,56 @@ export function JobsBoard({ listings }: JobsBoardProps) {
       </div>
 
       {grouped.map((group) => (
-        <section key={group.company} className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">{group.company}</h2>
-            <Badge variant="secondary">{group.listings.length} openings</Badge>
+        <section key={group.company} className="space-y-2">
+          <div className="flex items-center justify-between px-0.5">
+            <h2 className="text-sm font-semibold tracking-tight text-[var(--foreground)]">
+              {group.company}
+            </h2>
+            <Badge variant="secondary">{group.listings.length}</Badge>
           </div>
-          <div className="grid gap-3">
+          <div className="divide-y divide-black/[0.06] overflow-hidden rounded-[var(--radius)] border border-black/[0.06] bg-white">
             {group.listings.map((listing) => {
               const applied = listing.applications.length > 0;
 
               return (
-                <Card key={listing.id}>
-                  <CardHeader className="pb-3">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="space-y-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <CardTitle className="text-base">{listing.title}</CardTitle>
-                          {isNewListing(listing.firstSeenAt) ? (
-                            <Badge variant="success">New</Badge>
-                          ) : null}
-                          {applied ? <Badge variant="outline">Applied</Badge> : null}
-                        </div>
-                        <p className="text-sm text-slate-500">
-                          {listing.locations.join(" · ") || "Location not listed"}
-                        </p>
+                <article key={listing.id} className="p-4">
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <div className="flex flex-wrap items-start gap-2">
+                        <h3 className="text-[15px] font-medium leading-snug text-[var(--foreground)]">
+                          {listing.title}
+                        </h3>
+                        {isNewListing(listing.firstSeenAt) ? (
+                          <Badge variant="success">New</Badge>
+                        ) : null}
+                        {applied ? <Badge variant="outline">Applied</Badge> : null}
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Button asChild variant="outline" size="sm">
-                          <a href={listing.url} target="_blank" rel="noreferrer">
-                            <ExternalLink className="h-4 w-4" />
-                            View listing
-                          </a>
-                        </Button>
-                        <Button
-                          size="sm"
-                          disabled={applied || applyingId === listing.id}
-                          onClick={() => markApplied(listing.id)}
-                        >
-                          {applied
-                            ? "Tracking"
-                            : applyingId === listing.id
-                              ? "Saving..."
-                              : "Mark applied"}
-                        </Button>
-                      </div>
+                      <p className="text-sm text-[var(--muted)]">
+                        {listing.locations.join(" · ") || "Location not listed"}
+                      </p>
                     </div>
-                  </CardHeader>
-                </Card>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+                        <a href={listing.url} target="_blank" rel="noreferrer">
+                          <ExternalLink className="h-4 w-4" />
+                          View listing
+                        </a>
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="w-full sm:w-auto"
+                        disabled={applied || applyingId === listing.id}
+                        onClick={() => markApplied(listing.id)}
+                      >
+                        {applied
+                          ? "Tracking"
+                          : applyingId === listing.id
+                            ? "Saving..."
+                            : "Mark applied"}
+                      </Button>
+                    </div>
+                  </div>
+                </article>
               );
             })}
           </div>

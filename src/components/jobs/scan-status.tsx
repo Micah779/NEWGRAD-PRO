@@ -45,30 +45,35 @@ export function ScanStatus({ latestScan }: ScanStatusProps) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="space-y-1">
-        <p className="text-sm font-medium text-slate-900">Scan health</p>
-        <p className="text-sm text-slate-500">
+    <div className="flex flex-col gap-4 rounded-[var(--radius)] border border-black/[0.06] bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0 space-y-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-medium text-[var(--foreground)]">Scan health</p>
+          {latestScan ? (
+            <Badge variant={latestScan.success ? "success" : "warning"}>
+              {latestScan.success ? "Healthy" : "Partial failure"}
+            </Badge>
+          ) : (
+            <Badge variant="outline">Not scanned</Badge>
+          )}
+        </div>
+        <p className="text-sm leading-relaxed text-[var(--muted)]">
           {lastScannedAt
             ? `Last scanned ${formatRelativeTime(new Date(lastScannedAt))}`
             : "No scans yet"}
           {totalCount > 0 ? ` · ${successCount}/${totalCount} companies OK` : ""}
         </p>
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        {error ? <p className="text-sm text-[var(--destructive)]">{error}</p> : null}
       </div>
-      <div className="flex items-center gap-2">
-        {latestScan ? (
-          <Badge variant={latestScan.success ? "success" : "warning"}>
-            {latestScan.success ? "Healthy" : "Partial failure"}
-          </Badge>
-        ) : (
-          <Badge variant="outline">Not scanned</Badge>
-        )}
-        <Button onClick={handleScan} disabled={loading} size="sm">
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          {loading ? "Scanning..." : "Scan now"}
-        </Button>
-      </div>
+      <Button
+        onClick={handleScan}
+        disabled={loading}
+        size="sm"
+        className="w-full shrink-0 sm:w-auto"
+      >
+        <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+        {loading ? "Scanning..." : "Scan now"}
+      </Button>
     </div>
   );
 }

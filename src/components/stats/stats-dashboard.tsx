@@ -44,35 +44,34 @@ export function StatsDashboard({ applications }: StatsDashboardProps) {
     },
   );
 
+  const metrics = [
+    { label: "Total applied", value: applications.length },
+    { label: "Active pipeline", value: activeCount },
+    { label: "Offers", value: offerCount, accent: true },
+    { label: "Response rate", value: `${responseRate}%` },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Total applied</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">{applications.length}</CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Active pipeline</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">{activeCount}</CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Offers</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold text-emerald-600">
-            {offerCount}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-slate-500">Response rate</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">{responseRate}%</CardContent>
-        </Card>
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {metrics.map((metric) => (
+          <Card key={metric.label}>
+            <CardHeader className="pb-1">
+              <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                {metric.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p
+                className={`text-2xl font-semibold tracking-tight sm:text-3xl ${
+                  metric.accent ? "text-[var(--success)]" : "text-[var(--foreground)]"
+                }`}
+              >
+                {metric.value}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -85,17 +84,17 @@ export function StatsDashboard({ applications }: StatsDashboardProps) {
               const width =
                 applications.length === 0
                   ? 0
-                  : Math.max((step.count / applications.length) * 100, 8);
+                  : Math.max((step.count / applications.length) * 100, 6);
 
               return (
-                <div key={step.stage} className="space-y-1">
+                <div key={step.stage} className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm">
-                    <span>{step.label}</span>
-                    <span className="font-medium">{step.count}</span>
+                    <span className="text-[var(--muted)]">{step.label}</span>
+                    <span className="font-medium tabular-nums">{step.count}</span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-100">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-black/[0.05]">
                     <div
-                      className="h-2 rounded-full bg-slate-900"
+                      className="h-full rounded-full bg-[var(--foreground)] transition-all"
                       style={{ width: `${width}%` }}
                     />
                   </div>
@@ -109,21 +108,25 @@ export function StatsDashboard({ applications }: StatsDashboardProps) {
           <CardHeader>
             <CardTitle>Cycle summary</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 text-sm text-slate-600">
-            <p>
-              <span className="font-medium text-slate-900">Rejections:</span>{" "}
-              {rejectedCount}
-            </p>
-            <p>
-              <span className="font-medium text-slate-900">Median days between stages:</span>{" "}
-              {medianDays}
-            </p>
-            <div className="space-y-2">
-              <p className="font-medium text-slate-900">Current stage breakdown</p>
+          <CardContent className="space-y-4 text-sm">
+            <div className="flex justify-between border-b border-black/[0.06] pb-3">
+              <span className="text-[var(--muted)]">Rejections</span>
+              <span className="font-medium tabular-nums">{rejectedCount}</span>
+            </div>
+            <div className="flex justify-between border-b border-black/[0.06] pb-3">
+              <span className="text-[var(--muted)]">Median days between stages</span>
+              <span className="font-medium tabular-nums">{medianDays}</span>
+            </div>
+            <div className="space-y-2 pt-1">
+              <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                Stage breakdown
+              </p>
               {Object.entries(stageCounts).map(([stage, count]) => (
-                <div key={stage} className="flex justify-between">
-                  <span>{STAGE_LABELS[stage as ApplicationStage]}</span>
-                  <span className="font-medium">{count}</span>
+                <div key={stage} className="flex justify-between text-sm">
+                  <span className="text-[var(--muted)]">
+                    {STAGE_LABELS[stage as ApplicationStage]}
+                  </span>
+                  <span className="font-medium tabular-nums">{count}</span>
                 </div>
               ))}
             </div>
@@ -137,20 +140,22 @@ export function StatsDashboard({ applications }: StatsDashboardProps) {
         </CardHeader>
         <CardContent>
           {timeline.length === 0 ? (
-            <p className="text-sm text-slate-500">No applications yet.</p>
+            <p className="py-8 text-center text-sm text-[var(--muted)]">
+              No applications yet.
+            </p>
           ) : (
-            <div className="flex h-48 items-end gap-2">
+            <div className="flex h-40 items-end gap-1.5 sm:h-48 sm:gap-2">
               {timeline.map((item) => (
-                <div key={item.date} className="flex flex-1 flex-col items-center gap-2">
+                <div key={item.date} className="flex min-w-0 flex-1 flex-col items-center gap-2">
                   <div
-                    className="w-full rounded-t-md bg-slate-900"
+                    className="w-full rounded-t-md bg-[var(--foreground)]"
                     style={{
                       height: `${(item.count / maxTimeline) * 100}%`,
-                      minHeight: "12px",
+                      minHeight: "8px",
                     }}
                     title={`${item.count} on ${item.date}`}
                   />
-                  <span className="text-[10px] text-slate-500">
+                  <span className="w-full truncate text-center text-[9px] text-[var(--muted)] sm:text-[10px]">
                     {item.date.slice(5)}
                   </span>
                 </div>

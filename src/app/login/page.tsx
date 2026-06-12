@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth, isAuthConfigured, signIn } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -12,17 +11,20 @@ export default async function LoginPage() {
   const authConfigured = isAuthConfigured();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>NewGrad Pro</CardTitle>
-          <p className="text-sm text-slate-500">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--background)] px-6 safe-top safe-bottom">
+      <div className="w-full max-w-sm space-y-8 text-center">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)]">
+            NewGrad Pro
+          </h1>
+          <p className="text-sm leading-relaxed text-[var(--muted)]">
             Sign in to track your new grad job search.
           </p>
-        </CardHeader>
-        <CardContent className="space-y-3">
+        </div>
+
+        <div className="space-y-3">
           {!authConfigured ? (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+            <p className="rounded-[var(--radius)] border border-[var(--warning)]/20 bg-[var(--warning-bg)] p-4 text-left text-sm text-[var(--warning)]">
               OAuth is not configured yet. Add GitHub or Google credentials to
               `.env.local`, or run in development without an allowlist.
             </p>
@@ -34,7 +36,7 @@ export default async function LoginPage() {
               await signIn("github", { redirectTo: "/" });
             }}
           >
-            <Button className="w-full" type="submit" variant="default">
+            <Button className="w-full" type="submit" variant="default" size="lg">
               Continue with GitHub
             </Button>
           </form>
@@ -45,12 +47,12 @@ export default async function LoginPage() {
               await signIn("google", { redirectTo: "/" });
             }}
           >
-            <Button className="w-full" type="submit" variant="outline">
+            <Button className="w-full" type="submit" variant="outline" size="lg">
               Continue with Google
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { getDataDb } from "@/lib/data";
 import { PipelineBoard } from "@/components/applications/pipeline-board";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -7,9 +8,9 @@ export default async function ApplicationsPage() {
   const db = getDataDb();
   const rows = db
     ? await db.query.applications.findMany({
-    with: {
-      events: true,
-    },
+        with: {
+          events: true,
+        },
         orderBy: (table, { desc }) => [desc(table.appliedAt)],
       })
     : [];
@@ -31,13 +32,11 @@ export default async function ApplicationsPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Application Pipeline</h2>
-        <p className="text-slate-500">
-          Track every application from first submit through offer or rejection.
-        </p>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        title="Pipeline"
+        description="Track every application from first submit through offer or rejection."
+      />
       <PipelineBoard applications={serialized} />
     </div>
   );

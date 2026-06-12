@@ -1,6 +1,7 @@
 import { getDataDb } from "@/lib/data";
 import { getCompaniesWithScanStatus } from "@/scan/engine";
 import { CompanyList } from "@/components/companies/company-list";
+import { PageHeader } from "@/components/layout/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -19,13 +20,11 @@ export default async function CompaniesPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Target Companies</h2>
-        <p className="text-slate-500">
-          Manage which companies are included in automated scans.
-        </p>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        title="Companies"
+        description="Manage which companies are included in automated scans."
+      />
       <CompanyList companies={serialized} />
     </div>
   );
