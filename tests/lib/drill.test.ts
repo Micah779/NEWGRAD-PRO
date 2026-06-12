@@ -1,13 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { addCentralDays, formatCentralDay } from "@/lib/central-time";
 import { computeActivityStreak } from "@/lib/drill";
 
 function dayOffset(offset: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() - offset);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return formatCentralDay(addCentralDays(new Date(), -offset));
 }
 
 describe("computeActivityStreak", () => {

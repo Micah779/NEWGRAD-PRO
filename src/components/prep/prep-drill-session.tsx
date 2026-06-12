@@ -222,12 +222,9 @@ export function PrepDrillSession({ topicSlug }: PrepDrillSessionProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <Badge variant="secondary">
-          {index + 1} / {questions.length}
-        </Badge>
-        <Badge variant="outline">{question.topic}</Badge>
-      </div>
+      <Badge variant="secondary">
+        {index + 1} / {questions.length}
+      </Badge>
 
       <Card>
         <CardContent className="space-y-4 p-6">

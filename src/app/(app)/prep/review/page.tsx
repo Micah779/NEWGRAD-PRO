@@ -17,11 +17,7 @@ export default async function PrepReviewPage({ searchParams }: ReviewPageProps) 
       <div className="flex items-start justify-between gap-3">
         <PageHeader
           title="Review"
-          description={
-            topic
-              ? `Practicing due cards for ${topic.replace(/-/g, " ")}.`
-              : "Review all due flashcards across topics."
-          }
+          description="Review due flashcards."
         />
         <Button asChild variant="outline" size="sm" className="shrink-0">
           <Link href="/prep">Back</Link>

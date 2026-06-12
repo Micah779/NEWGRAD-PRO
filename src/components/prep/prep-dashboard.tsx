@@ -9,12 +9,15 @@ type TopicStat = {
   summary: string;
   total: number;
   due: number;
+  practiceDue: number;
   drillAccuracy: number | null;
+  practiceAccuracy: number | null;
 };
 
 type PrepDashboardProps = {
   totalCards: number;
   dueCount: number;
+  practiceDueCount: number;
   streak: number;
   topicStats: TopicStat[];
 };
@@ -22,20 +25,31 @@ type PrepDashboardProps = {
 export function PrepDashboard({
   totalCards,
   dueCount,
+  practiceDueCount,
   streak,
   topicStats,
 }: PrepDashboardProps) {
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Card>
           <CardHeader className="pb-1">
             <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
-              Due today
+              Cards due
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold tabular-nums">{dueCount}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+              Problems due
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-semibold tabular-nums">{practiceDueCount}</p>
           </CardContent>
         </Card>
         <Card>
@@ -60,9 +74,17 @@ export function PrepDashboard({
         </Card>
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Button asChild className="w-full sm:w-auto" disabled={dueCount === 0}>
           <Link href="/prep/review">Review due cards ({dueCount})</Link>
+        </Button>
+        <Button
+          asChild
+          variant="outline"
+          className="w-full sm:w-auto"
+          disabled={practiceDueCount === 0}
+        >
+          <Link href="/prep/practice">Practice problems ({practiceDueCount})</Link>
         </Button>
         <Button asChild variant="outline" className="w-full sm:w-auto">
           <Link href="/prep/drill">Drill patterns</Link>
@@ -88,8 +110,14 @@ export function PrepDashboard({
                     ) : (
                       <Badge variant="secondary">Caught up</Badge>
                     )}
+                    {topic.practiceDue > 0 ? (
+                      <Badge variant="success">{topic.practiceDue} practice</Badge>
+                    ) : null}
                     {topic.drillAccuracy !== null ? (
                       <Badge variant="outline">{topic.drillAccuracy}% drill</Badge>
+                    ) : null}
+                    {topic.practiceAccuracy !== null ? (
+                      <Badge variant="outline">{topic.practiceAccuracy}% practice</Badge>
                     ) : null}
                   </div>
                 </div>
@@ -105,6 +133,17 @@ export function PrepDashboard({
                   >
                     <Link href={`/prep/review?topic=${topic.slug}`}>
                       Review topic ({topic.due})
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="secondary"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    disabled={topic.practiceDue === 0}
+                  >
+                    <Link href={`/prep/practice?topic=${topic.slug}`}>
+                      Practice topic ({topic.practiceDue})
                     </Link>
                   </Button>
                   <Button asChild variant="secondary" size="sm" className="w-full sm:w-auto">

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { lte } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { getDataDb } from "@/lib/data";
 import { prepCards } from "@/db/schema";
+import { isDueAtOrBefore } from "@/lib/central-time";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -20,13 +20,12 @@ export async function GET(request: Request) {
 
   const now = new Date();
   const cards = await db.query.prepCards.findMany({
-    where: lte(prepCards.dueAt, now),
     orderBy: (table, { asc }) => [asc(table.dueAt)],
   });
 
-  const filtered = topicSlug
-    ? cards.filter((card) => card.topicSlug === topicSlug)
-    : cards;
+  const filtered = cards
+    .filter((card) => isDueAtOrBefore(card.dueAt, now))
+    .filter((card) => !topicSlug || card.topicSlug === topicSlug);
 
   return NextResponse.json({
     cards: filtered.map((card) => ({

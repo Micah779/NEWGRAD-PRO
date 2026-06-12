@@ -398,6 +398,8 @@ export const PREP_CARDS: PrepCardSeed[] = [
 
 export { PREP_DRILLS } from "./prep-drills";
 export type { PrepDrillSeed, PrepDrillChoice } from "./prep-drills";
+export { PREP_PRACTICE_PROBLEMS } from "./prep-problems";
+export type { PrepPracticeSeed, PrepPracticeChoice } from "./prep-problems";
 
 export function getPrepTopic(slug: string) {
   return PREP_TOPICS.find((topic) => topic.slug === slug) ?? null;

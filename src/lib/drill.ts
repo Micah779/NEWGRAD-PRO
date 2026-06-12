@@ -2,6 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import type { Db } from "@/db";
 import { drillAttempts, drillQuestions } from "@/db/schema";
 import type { DrillChoice } from "@/db/schema";
+import { addCentralDays, formatCentralDay } from "@/lib/central-time";
 
 const SESSION_SIZE = 10;
 const MAX_PER_TOPIC = 2;
@@ -24,13 +25,6 @@ function shuffle<T>(items: T[]): T[] {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
-}
-
-function formatDay(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
 }
 
 function scoreQuestion(
@@ -167,23 +161,22 @@ export async function getTopicDrillAccuracy(
   return stats;
 }
 
-export function computeActivityStreak(activeDays: Set<string>): number {
-  const today = formatDay(new Date());
-  const yesterday = formatDay(new Date(Date.now() - 24 * 60 * 60 * 1000));
+export function computeActivityStreak(activeDays: Set<string>, now = new Date()): number {
+  const today = formatCentralDay(now);
+  const yesterday = formatCentralDay(addCentralDays(now, -1));
 
-  let cursor: Date | null = null;
-  if (activeDays.has(today)) {
-    cursor = new Date();
-  } else if (activeDays.has(yesterday)) {
-    cursor = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  } else {
-    return 0;
+  let offset = 0;
+  if (!activeDays.has(today)) {
+    if (!activeDays.has(yesterday)) {
+      return 0;
+    }
+    offset = 1;
   }
 
   let streak = 0;
-  while (cursor && activeDays.has(formatDay(cursor))) {
+  while (activeDays.has(formatCentralDay(addCentralDays(now, -offset)))) {
     streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
+    offset += 1;
   }
 
   return streak;

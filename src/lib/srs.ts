@@ -1,3 +1,5 @@
+import { addCentralDays } from "@/lib/central-time";
+
 export type ReviewGrade = "again" | "hard" | "good" | "easy";
 
 export type SrsState = {
@@ -7,7 +9,6 @@ export type SrsState = {
 };
 
 const MIN_EASE = 1.3;
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export function scheduleReview(
   state: SrsState,
@@ -45,7 +46,8 @@ export function scheduleReview(
     ease += 0.15;
   }
 
-  const dueAt = new Date(now.getTime() + nextInterval * MS_PER_DAY);
+  const dueAt =
+    nextInterval <= 0 ? now : addCentralDays(now, nextInterval);
 
   return {
     reps,

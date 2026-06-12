@@ -1,11 +1,11 @@
 import { notInArray } from "drizzle-orm";
-import { companies, drillQuestions, prepCards } from "./schema";
+import { companies, drillQuestions, practiceProblems, prepCards } from "./schema";
 import type { Db } from "./index";
 import { ALL_CATALOG_COMPANIES } from "./company-catalog";
-import { PREP_CARDS, PREP_DRILLS, PREP_TOPICS } from "./prep-catalog";
+import { PREP_CARDS, PREP_DRILLS, PREP_PRACTICE_PROBLEMS, PREP_TOPICS } from "./prep-catalog";
 
 export { ALL_CATALOG_COMPANIES as SEED_COMPANIES } from "./company-catalog";
-export { PREP_CARDS, PREP_TOPICS, PREP_DRILLS } from "./prep-catalog";
+export { PREP_CARDS, PREP_TOPICS, PREP_DRILLS, PREP_PRACTICE_PROBLEMS } from "./prep-catalog";
 
 const topicTitle = (slug: string) =>
   PREP_TOPICS.find((topic) => topic.slug === slug)?.title ?? slug;
@@ -89,5 +89,50 @@ export async function seedDrillQuestions(db: Db) {
     await db
       .delete(drillQuestions)
       .where(notInArray(drillQuestions.slug, catalogSlugs));
+  }
+}
+
+export async function seedPracticeProblems(db: Db) {
+  const catalogSlugs = PREP_PRACTICE_PROBLEMS.map((item) => item.slug);
+
+  for (const item of PREP_PRACTICE_PROBLEMS) {
+    await db
+      .insert(practiceProblems)
+      .values({
+        slug: item.slug,
+        leetcodeNum: item.leetcodeNum,
+        title: item.title,
+        topicSlug: item.topicSlug,
+        statement: item.statement,
+        implementationCode: item.code,
+        patternChoices: item.patternChoices,
+        correctPatternChoiceId: item.correctPatternChoiceId,
+        patternExplanation: item.patternExplanation,
+        complexityChoices: item.complexityChoices,
+        correctComplexityChoiceId: item.correctComplexityChoiceId,
+        complexityExplanation: item.complexityExplanation,
+      })
+      .onConflictDoUpdate({
+        target: practiceProblems.slug,
+        set: {
+          leetcodeNum: item.leetcodeNum,
+          title: item.title,
+          topicSlug: item.topicSlug,
+          statement: item.statement,
+          implementationCode: item.code,
+          patternChoices: item.patternChoices,
+          correctPatternChoiceId: item.correctPatternChoiceId,
+          patternExplanation: item.patternExplanation,
+          complexityChoices: item.complexityChoices,
+          correctComplexityChoiceId: item.correctComplexityChoiceId,
+          complexityExplanation: item.complexityExplanation,
+        },
+      });
+  }
+
+  if (catalogSlugs.length > 0) {
+    await db
+      .delete(practiceProblems)
+      .where(notInArray(practiceProblems.slug, catalogSlugs));
   }
 }

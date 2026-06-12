@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { formatCentralDay } from "@/lib/central-time";
 import { isCardDue, scheduleReview } from "@/lib/srs";
 
 describe("scheduleReview", () => {
@@ -16,13 +17,21 @@ describe("scheduleReview", () => {
     const first = scheduleReview(base, "good", now);
     expect(first.reps).toBe(1);
     expect(first.intervalDays).toBe(1);
+    expect(formatCentralDay(first.dueAt)).toBe("2026-06-12");
 
     const second = scheduleReview(first, "good", now);
     expect(second.reps).toBe(2);
     expect(second.intervalDays).toBe(3);
+    expect(formatCentralDay(second.dueAt)).toBe("2026-06-14");
 
     const third = scheduleReview(second, "good", now);
     expect(third.intervalDays).toBeGreaterThanOrEqual(3);
+  });
+
+  it("schedules again as immediately due", () => {
+    const next = scheduleReview(base, "again", now);
+    expect(next.intervalDays).toBe(0);
+    expect(next.dueAt.getTime()).toBe(now.getTime());
   });
 
   it("easy gives longer interval than good", () => {

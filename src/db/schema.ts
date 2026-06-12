@@ -141,6 +141,39 @@ export const drillAttempts = pgTable("drill_attempts", {
   attemptedAt: timestamp("attempted_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const practiceProblems = pgTable("practice_problems", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: text("slug").notNull().unique(),
+  leetcodeNum: integer("leetcode_num").notNull(),
+  title: text("title").notNull(),
+  topicSlug: text("topic_slug").notNull(),
+  statement: text("statement").notNull(),
+  implementationCode: text("implementation_code").notNull(),
+  patternChoices: jsonb("pattern_choices").$type<DrillChoice[]>().notNull(),
+  correctPatternChoiceId: text("correct_pattern_choice_id").notNull(),
+  patternExplanation: text("pattern_explanation").notNull(),
+  complexityChoices: jsonb("complexity_choices").$type<DrillChoice[]>().notNull(),
+  correctComplexityChoiceId: text("correct_complexity_choice_id").notNull(),
+  complexityExplanation: text("complexity_explanation").notNull(),
+  reps: integer("reps").notNull().default(0),
+  ease: real("ease").notNull().default(2.5),
+  intervalDays: integer("interval_days").notNull().default(0),
+  dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
+  lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const practiceAttempts = pgTable("practice_attempts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  problemId: uuid("problem_id")
+    .notNull()
+    .references(() => practiceProblems.id, { onDelete: "cascade" }),
+  stage: integer("stage").notNull(),
+  selectedChoiceId: text("selected_choice_id").notNull(),
+  correct: boolean("correct").notNull(),
+  attemptedAt: timestamp("attempted_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const scanRuns = pgTable("scan_runs", {
   id: uuid("id").defaultRandom().primaryKey(),
   startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
@@ -184,4 +217,6 @@ export type ScanRun = typeof scanRuns.$inferSelect;
 export type PrepCard = typeof prepCards.$inferSelect;
 export type DrillQuestion = typeof drillQuestions.$inferSelect;
 export type DrillAttempt = typeof drillAttempts.$inferSelect;
+export type PracticeProblem = typeof practiceProblems.$inferSelect;
+export type PracticeAttempt = typeof practiceAttempts.$inferSelect;
 export type ApplicationStage = (typeof applicationStageEnum.enumValues)[number];

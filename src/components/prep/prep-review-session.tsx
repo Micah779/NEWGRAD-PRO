@@ -249,12 +249,9 @@ export function PrepReviewSession({ topicSlug }: PrepReviewSessionProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <Badge variant="secondary">
-          {index + 1} / {cards.length}
-        </Badge>
-        <Badge variant="outline">{card.topic}</Badge>
-      </div>
+      <Badge variant="secondary">
+        {index + 1} / {cards.length}
+      </Badge>
 
       <button
         type="button"
