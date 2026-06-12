@@ -1,50 +1,21 @@
 import { companies } from "./schema";
 import type { Db } from "./index";
+import { ALL_CATALOG_COMPANIES } from "./company-catalog";
 
-export const SEED_COMPANIES = [
-  {
-    name: "Google",
-    slug: "google",
-    adapterKey: "google",
-    careersUrl: "https://careers.google.com/jobs/results/",
-  },
-  {
-    name: "Meta",
-    slug: "meta",
-    adapterKey: "meta",
-    careersUrl: "https://www.metacareers.com/jobs",
-  },
-  {
-    name: "Amazon",
-    slug: "amazon",
-    adapterKey: "amazon",
-    careersUrl: "https://www.amazon.jobs/en/search",
-  },
-  {
-    name: "Apple",
-    slug: "apple",
-    adapterKey: "apple",
-    careersUrl: "https://jobs.apple.com/en-us/search",
-  },
-  {
-    name: "Microsoft",
-    slug: "microsoft",
-    adapterKey: "microsoft",
-    careersUrl: "https://careers.microsoft.com/us/en/search-results",
-  },
-  {
-    name: "Netflix",
-    slug: "netflix",
-    adapterKey: "netflix",
-    careersUrl: "https://explore.jobs.netflix.net/careers",
-  },
-] as const;
+export { ALL_CATALOG_COMPANIES as SEED_COMPANIES } from "./company-catalog";
 
 export async function seedCompanies(db: Db) {
-  for (const company of SEED_COMPANIES) {
+  for (const company of ALL_CATALOG_COMPANIES) {
     await db
       .insert(companies)
-      .values(company)
+      .values({
+        name: company.name,
+        slug: company.slug,
+        adapterKey: company.adapterKey,
+        adapterConfig: company.adapterConfig ?? null,
+        careersUrl: company.careersUrl,
+        enabled: company.enabled ?? true,
+      })
       .onConflictDoNothing({ target: companies.slug });
   }
 }

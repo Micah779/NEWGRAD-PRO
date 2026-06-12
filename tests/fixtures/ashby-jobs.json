@@ -1,0 +1,12 @@
+{
+  "jobs": [
+    {
+      "id": "job-uuid-1",
+      "title": "Software Engineer - Early Career",
+      "jobUrl": "https://jobs.ashbyhq.com/example/job-uuid-1",
+      "location": "Remote",
+      "department": "Engineering",
+      "descriptionPlain": "New graduate software engineer role"
+    }
+  ]
+}

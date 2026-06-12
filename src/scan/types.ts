@@ -1,3 +1,5 @@
+import type { Company } from "@/db/schema";
+
 export type RawJob = {
   externalId: string;
   title: string;
@@ -6,10 +8,17 @@ export type RawJob = {
   description?: string;
 };
 
+export type AdapterConfig = {
+  board?: string;
+  tenant?: string;
+  site?: string;
+  wdInstance?: string;
+};
+
 export type CompanyAdapter = {
   key: string;
   name: string;
-  fetchJobs: () => Promise<RawJob[]>;
+  fetchJobs: (company: Company) => Promise<RawJob[]>;
 };
 
 export type AdapterFetchResult = {

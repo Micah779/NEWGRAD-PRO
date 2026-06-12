@@ -1,0 +1,13 @@
+[
+  {
+    "id": "abc-123",
+    "text": "New Grad Software Engineer",
+    "hostedUrl": "https://jobs.lever.co/example/abc-123",
+    "categories": {
+      "location": "New York, NY",
+      "team": "Engineering",
+      "commitment": "Full-time"
+    },
+    "descriptionPlain": "Entry level university hire"
+  }
+]

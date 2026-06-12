@@ -13,6 +13,9 @@ import { getAdapter } from "./adapters";
 import { seedCompanies } from "@/db/seed";
 import type { RawJob } from "./types";
 
+const SCAN_CONCURRENCY = 8;
+const ADAPTER_TIMEOUT_MS = 15_000;
+
 export function filterNewGradJobs(jobs: RawJob[]) {
   return jobs.filter((job) => isNewGradRole(job.title, job.description ?? ""));
 }
@@ -109,6 +112,68 @@ export async function syncCompanyJobs(
   };
 }
 
+async function scanCompany(
+  db: Db,
+  company: typeof companies.$inferSelect,
+): Promise<ScanCompanyResult> {
+  const adapter = getAdapter(company.adapterKey);
+
+  if (!adapter) {
+    return {
+      companySlug: company.slug,
+      success: false,
+      jobsFound: 0,
+      newGradJobs: 0,
+      error: `Unknown adapter: ${company.adapterKey}`,
+    };
+  }
+
+  try {
+    const jobs = await Promise.race([
+      adapter.fetchJobs(company),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`Scan timed out after ${ADAPTER_TIMEOUT_MS}ms`)),
+          ADAPTER_TIMEOUT_MS,
+        ),
+      ),
+    ]);
+
+    const syncResult = await syncCompanyJobs(db, company, jobs);
+
+    return {
+      companySlug: company.slug,
+      success: true,
+      jobsFound: syncResult.jobsFound,
+      newGradJobs: syncResult.newGradJobs,
+    };
+  } catch (error) {
+    return {
+      companySlug: company.slug,
+      success: false,
+      jobsFound: 0,
+      newGradJobs: 0,
+      error: error instanceof Error ? error.message : "Unknown scan error",
+    };
+  }
+}
+
+async function runInBatches<T, R>(
+  items: T[],
+  batchSize: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = [];
+
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.all(batch.map(fn));
+    results.push(...batchResults);
+  }
+
+  return results;
+}
+
 export async function runScan(db: Db) {
   await seedCompanies(db);
 
@@ -127,42 +192,11 @@ export async function runScan(db: Db) {
     })
     .returning();
 
-  const results: ScanCompanyResult[] = [];
-
-  for (const company of enabledCompanies) {
-    const adapter = getAdapter(company.adapterKey);
-
-    if (!adapter) {
-      results.push({
-        companySlug: company.slug,
-        success: false,
-        jobsFound: 0,
-        newGradJobs: 0,
-        error: `Unknown adapter: ${company.adapterKey}`,
-      });
-      continue;
-    }
-
-    try {
-      const jobs = await adapter.fetchJobs();
-      const syncResult = await syncCompanyJobs(db, company, jobs);
-
-      results.push({
-        companySlug: company.slug,
-        success: true,
-        jobsFound: syncResult.jobsFound,
-        newGradJobs: syncResult.newGradJobs,
-      });
-    } catch (error) {
-      results.push({
-        companySlug: company.slug,
-        success: false,
-        jobsFound: 0,
-        newGradJobs: 0,
-        error: error instanceof Error ? error.message : "Unknown scan error",
-      });
-    }
-  }
+  const results = await runInBatches(
+    enabledCompanies,
+    SCAN_CONCURRENCY,
+    (company) => scanCompany(db, company),
+  );
 
   const finishedAt = new Date();
   const success = results.some((result) => result.success);

@@ -21,11 +21,19 @@ export const applicationStageEnum = pgEnum("application_stage", [
   "withdrawn",
 ]);
 
+export type AdapterConfig = {
+  board?: string;
+  tenant?: string;
+  site?: string;
+  wdInstance?: string;
+};
+
 export const companies = pgTable("companies", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   adapterKey: text("adapter_key").notNull(),
+  adapterConfig: jsonb("adapter_config").$type<AdapterConfig>(),
   careersUrl: text("careers_url").notNull(),
   enabled: boolean("enabled").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

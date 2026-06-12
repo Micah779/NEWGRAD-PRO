@@ -1,0 +1,12 @@
+{
+  "jobs": [
+    {
+      "id": 123456,
+      "title": "Software Engineer, New Grad 2026",
+      "absolute_url": "https://boards.greenhouse.io/example/jobs/123456",
+      "location": { "name": "San Francisco, CA" },
+      "content": "University graduate program entry level",
+      "departments": [{ "name": "Engineering" }]
+    }
+  ]
+}
