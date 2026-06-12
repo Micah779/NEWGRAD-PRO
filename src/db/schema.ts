@@ -7,6 +7,8 @@ import {
   jsonb,
   pgEnum,
   uniqueIndex,
+  integer,
+  real,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -97,6 +99,21 @@ export type ScanCompanyResult = {
   error?: string;
 };
 
+export const prepCards = pgTable("prep_cards", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: text("slug").notNull().unique(),
+  topicSlug: text("topic_slug").notNull(),
+  topic: text("topic").notNull(),
+  front: text("front").notNull(),
+  back: text("back").notNull(),
+  reps: integer("reps").notNull().default(0),
+  ease: real("ease").notNull().default(2.5),
+  intervalDays: integer("interval_days").notNull().default(0),
+  dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
+  lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const scanRuns = pgTable("scan_runs", {
   id: uuid("id").defaultRandom().primaryKey(),
   startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
@@ -137,4 +154,5 @@ export type JobListing = typeof jobListings.$inferSelect;
 export type Application = typeof applications.$inferSelect;
 export type ApplicationEvent = typeof applicationEvents.$inferSelect;
 export type ScanRun = typeof scanRuns.$inferSelect;
+export type PrepCard = typeof prepCards.$inferSelect;
 export type ApplicationStage = (typeof applicationStageEnum.enumValues)[number];

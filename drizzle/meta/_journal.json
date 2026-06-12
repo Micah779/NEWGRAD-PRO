@@ -15,6 +15,13 @@
       "when": 1718236800000,
       "tag": "0001_adapter_config",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1718323200000,
+      "tag": "0002_prep_cards",
+      "breakpoints": true
     }
   ]
 }

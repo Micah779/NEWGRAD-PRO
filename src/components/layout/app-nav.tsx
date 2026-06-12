@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Briefcase, Building2, BarChart3, KanbanSquare } from "lucide-react";
+import { Briefcase, Building2, BarChart3, KanbanSquare, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -10,6 +10,7 @@ const links = [
   { href: "/applications", label: "Pipeline", icon: KanbanSquare },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/companies", label: "Companies", icon: Building2 },
+  { href: "/prep", label: "Prep", icon: GraduationCap },
 ];
 
 export function AppNav() {
@@ -19,7 +20,10 @@ export function AppNav() {
     <nav className="flex items-center gap-1">
       {links.map((link) => {
         const Icon = link.icon;
-        const active = pathname === link.href;
+        const active =
+          link.href === "/"
+            ? pathname === "/"
+            : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
         return (
           <Link

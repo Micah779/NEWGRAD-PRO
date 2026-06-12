@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Briefcase, Building2, BarChart3, KanbanSquare } from "lucide-react";
+import { Briefcase, Building2, BarChart3, KanbanSquare, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -10,6 +10,7 @@ const links = [
   { href: "/applications", label: "Pipeline", icon: KanbanSquare },
   { href: "/stats", label: "Stats", icon: BarChart3 },
   { href: "/companies", label: "Companies", icon: Building2 },
+  { href: "/prep", label: "Prep", icon: GraduationCap },
 ];
 
 export function MobileBottomNav() {
@@ -23,14 +24,17 @@ export function MobileBottomNav() {
       <div className="mx-auto flex h-[var(--nav-height)] max-w-lg items-stretch justify-around px-2">
         {links.map((link) => {
           const Icon = link.icon;
-          const active = pathname === link.href;
+          const active =
+            link.href === "/"
+              ? pathname === "/"
+              : pathname === link.href || pathname.startsWith(`${link.href}/`);
 
           return (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "flex min-w-[4.5rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-1 text-[10px] font-medium transition-colors active:scale-95",
+                "flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-0.5 py-1 text-[9px] font-medium transition-colors active:scale-95 sm:text-[10px]",
                 active
                   ? "text-[var(--foreground)]"
                   : "text-[var(--muted)]",

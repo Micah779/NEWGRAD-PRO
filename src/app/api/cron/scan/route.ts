@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
+import { sendMorningDigest } from "@/lib/digest";
 import { runScan } from "@/scan/engine";
 
 export const maxDuration = 300;
@@ -23,7 +24,19 @@ export async function GET(request: Request) {
   try {
     const db = getDb();
     const result = await runScan(db);
-    return NextResponse.json(result);
+
+    const url = new URL(request.url);
+    const shouldSendDigest = url.searchParams.get("digest") === "1";
+
+    let digest = null;
+    if (shouldSendDigest) {
+      digest = await sendMorningDigest(db, result.results);
+    }
+
+    return NextResponse.json({
+      ...result,
+      digest,
+    });
   } catch (error) {
     return NextResponse.json(
       {
