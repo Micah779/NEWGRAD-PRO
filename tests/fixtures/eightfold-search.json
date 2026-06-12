@@ -1,0 +1,13 @@
+{
+  "data": {
+    "positions": [
+      {
+        "id": 12345,
+        "name": "Software Engineer - Entry Level",
+        "canonicalPositionUrl": "https://careers.microsoft.com/us/en/job/12345",
+        "location": "Redmond, WA",
+        "department": "Engineering"
+      }
+    ]
+  }
+}

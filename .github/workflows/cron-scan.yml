@@ -1,0 +1,16 @@
+name: Evening Scan
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger deployed scan endpoint
+        run: |
+          curl --fail-with-body -X POST "${{ secrets.APP_URL }}/api/cron/scan" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

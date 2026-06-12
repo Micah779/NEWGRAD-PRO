@@ -1,0 +1,22 @@
+{
+  "jobs": [
+    {
+      "id_icims": "3093439",
+      "title": "Software Dev Engineer I, Amazon University Talent Acquisition",
+      "job_path": "/en/jobs/3093439/software-dev-engineer-i-amazon-university-talent-acquisition",
+      "normalized_location": "Seattle, Washington, USA",
+      "description_short": "University hire software development role",
+      "basic_qualifications": "Bachelor's degree in Computer Science",
+      "university_job": true
+    },
+    {
+      "id_icims": "9999999",
+      "title": "Senior Software Engineer",
+      "job_path": "/en/jobs/9999999/senior-software-engineer",
+      "normalized_location": "Seattle, Washington, USA",
+      "description_short": "Senior engineering role",
+      "basic_qualifications": "10+ years experience",
+      "university_job": false
+    }
+  ]
+}
