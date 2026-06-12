@@ -9,20 +9,20 @@ type TopicStat = {
   summary: string;
   total: number;
   due: number;
-  reviewed: number;
+  drillAccuracy: number | null;
 };
 
 type PrepDashboardProps = {
   totalCards: number;
   dueCount: number;
-  reviewedCount: number;
+  streak: number;
   topicStats: TopicStat[];
 };
 
 export function PrepDashboard({
   totalCards,
   dueCount,
-  reviewedCount,
+  streak,
   topicStats,
 }: PrepDashboardProps) {
   return (
@@ -41,11 +41,11 @@ export function PrepDashboard({
         <Card>
           <CardHeader className="pb-1">
             <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
-              Reviewed
+              Streak
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold tabular-nums">{reviewedCount}</p>
+            <p className="text-2xl font-semibold tabular-nums">{streak}</p>
           </CardContent>
         </Card>
         <Card>
@@ -63,6 +63,9 @@ export function PrepDashboard({
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button asChild className="w-full sm:w-auto" disabled={dueCount === 0}>
           <Link href="/prep/review">Review due cards ({dueCount})</Link>
+        </Button>
+        <Button asChild variant="outline" className="w-full sm:w-auto">
+          <Link href="/prep/drill">Drill patterns</Link>
         </Button>
       </div>
 
@@ -85,12 +88,12 @@ export function PrepDashboard({
                     ) : (
                       <Badge variant="secondary">Caught up</Badge>
                     )}
-                    <Badge variant="outline">
-                      {topic.reviewed}/{topic.total} reviewed
-                    </Badge>
+                    {topic.drillAccuracy !== null ? (
+                      <Badge variant="outline">{topic.drillAccuracy}% drill</Badge>
+                    ) : null}
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
                     <Link href={`/prep/topics/${topic.slug}`}>Study notes</Link>
                   </Button>
@@ -103,6 +106,9 @@ export function PrepDashboard({
                     <Link href={`/prep/review?topic=${topic.slug}`}>
                       Review topic ({topic.due})
                     </Link>
+                  </Button>
+                  <Button asChild variant="secondary" size="sm" className="w-full sm:w-auto">
+                    <Link href={`/prep/drill?topic=${topic.slug}`}>Drill topic</Link>
                   </Button>
                 </div>
               </CardHeader>

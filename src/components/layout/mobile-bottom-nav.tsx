@@ -36,7 +36,7 @@ export function MobileBottomNav() {
               className={cn(
                 "flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-0.5 py-1 text-[9px] font-medium transition-colors active:scale-95 sm:text-[10px]",
                 active
-                  ? "text-[var(--foreground)]"
+                  ? "text-[var(--accent)]"
                   : "text-[var(--muted)]",
               )}
             >

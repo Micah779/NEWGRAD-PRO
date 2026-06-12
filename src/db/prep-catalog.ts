@@ -269,7 +269,7 @@ Most OA code is recombination of these tools — not new algorithms.`,
 4. One edge case
 5. Rough complexity
 
-## Daily habit (from your prep plan)
+## Daily habit
 - One spoken walkthrough
 - One clean re-solve
 - One timed block
@@ -394,9 +394,10 @@ export const PREP_CARDS: PrepCardSeed[] = [
   card("clean-code-execution", topicTitle("clean-code-execution"), "word-search-talk", "Spoken Word Search plan (30 sec)", "Try each cell as start; DFS with index; mark visited; 4 directions; unmark on backtrack."),
   card("clean-code-execution", topicTitle("clean-code-execution"), "overlap-talk", "Spoken meeting overlap plan", "Sort by start; scan once; if start < prev end return false."),
   card("clean-code-execution", topicTitle("clean-code-execution"), "daily-habit", "Effective daily prep structure", "One spoken solution, one clean re-solve, one timed block — distributed practice beats cramming."),
-  card("clean-code-execution", topicTitle("clean-code-execution"), "tiktok-vs-snowflake", "TikTok vs Snowflake prep emphasis", "TikTok: breadth + fast pattern retrieval. Snowflake: deeper design, graphs, tries, scheduling, interval/heap modeling."),
-  card("clean-code-execution", topicTitle("clean-code-execution"), "overlap-set", "High-yield overlap problems for both tracks", "Word Search, LRU, Course Schedule, Meeting Rooms II, Encode/Decode Strings, Top K, Task Scheduler, Rotting Oranges, Job Scheduling."),
 ];
+
+export { PREP_DRILLS } from "./prep-drills";
+export type { PrepDrillSeed, PrepDrillChoice } from "./prep-drills";
 
 export function getPrepTopic(slug: string) {
   return PREP_TOPICS.find((topic) => topic.slug === slug) ?? null;

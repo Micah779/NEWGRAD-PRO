@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NewGrad Pro",
-  description: "Track new grad job openings and your application pipeline.",
+  title: "scout",
+  description: "Track new grad openings and interview prep.",
 };
 
 export const viewport = {

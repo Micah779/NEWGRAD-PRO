@@ -1,33 +1,33 @@
 import Link from "next/link";
-import { PrepReviewSession } from "@/components/prep/prep-review-session";
+import { PrepDrillSession } from "@/components/prep/prep-drill-session";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
-type ReviewPageProps = {
+type DrillPageProps = {
   searchParams: Promise<{ topic?: string }>;
 };
 
-export default async function PrepReviewPage({ searchParams }: ReviewPageProps) {
+export default async function PrepDrillPage({ searchParams }: DrillPageProps) {
   const { topic } = await searchParams;
 
   return (
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-3">
         <PageHeader
-          title="Review"
+          title="Drill"
           description={
             topic
-              ? `Practicing due cards for ${topic.replace(/-/g, " ")}.`
-              : "Review all due flashcards across topics."
+              ? `Pattern recognition for ${topic.replace(/-/g, " ")}.`
+              : "Name the pattern family from a problem scenario."
           }
         />
         <Button asChild variant="outline" size="sm" className="shrink-0">
           <Link href="/prep">Back</Link>
         </Button>
       </div>
-      <PrepReviewSession key={topic ?? "all"} topicSlug={topic} />
+      <PrepDrillSession key={topic ?? "all"} topicSlug={topic} />
     </div>
   );
 }

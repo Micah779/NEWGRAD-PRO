@@ -1,7 +1,7 @@
 const DEFAULT_HEADERS = {
   Accept: "application/json",
   "User-Agent":
-    "Mozilla/5.0 (compatible; NewGradPro/1.0; +https://github.com/newgrad-pro)",
+    "Mozilla/5.0 (compatible; Scout/1.0)",
 };
 
 export async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {

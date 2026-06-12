@@ -14,11 +14,11 @@ export default async function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--background)] px-6 safe-top safe-bottom">
       <div className="w-full max-w-sm space-y-8 text-center">
         <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)]">
-            NewGrad Pro
+          <h1 className="font-mono text-2xl font-medium tracking-tight text-[var(--foreground)]">
+            scout<span className="text-[var(--accent)]">.</span>
           </h1>
           <p className="text-sm leading-relaxed text-[var(--muted)]">
-            Sign in to track your new grad job search.
+            Sign in to your job search workspace.
           </p>
         </div>
 

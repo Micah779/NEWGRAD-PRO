@@ -1,18 +1,40 @@
 import { lte, sql } from "drizzle-orm";
 import type { Db } from "@/db";
-import { prepCards } from "@/db/schema";
+import { drillAttempts, prepCards } from "@/db/schema";
 import { PREP_TOPICS } from "@/db/prep-catalog";
+import { computeActivityStreak, getTopicDrillAccuracy } from "@/lib/drill";
+
+function formatDay(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 export async function getPrepDashboardData(db: Db) {
   const now = new Date();
-  const cards = await db.select().from(prepCards);
+  const [cards, drillAttemptDates] = await Promise.all([
+    db.select().from(prepCards),
+    db.select({ attemptedAt: drillAttempts.attemptedAt }).from(drillAttempts),
+  ]);
 
   const dueCards = cards.filter((card) => card.dueAt.getTime() <= now.getTime());
+  const drillAccuracy = await getTopicDrillAccuracy(db);
+
+  const activeDays = new Set<string>();
+  for (const card of cards) {
+    if (card.lastReviewedAt) {
+      activeDays.add(formatDay(card.lastReviewedAt));
+    }
+  }
+  for (const attempt of drillAttemptDates) {
+    activeDays.add(formatDay(attempt.attemptedAt));
+  }
 
   const topicStats = PREP_TOPICS.map((topic) => {
     const topicCards = cards.filter((card) => card.topicSlug === topic.slug);
     const due = topicCards.filter((card) => card.dueAt.getTime() <= now.getTime());
-    const reviewed = topicCards.filter((card) => card.reps > 0).length;
+    const drillStats = drillAccuracy.get(topic.slug);
 
     return {
       slug: topic.slug,
@@ -20,14 +42,17 @@ export async function getPrepDashboardData(db: Db) {
       summary: topic.summary,
       total: topicCards.length,
       due: due.length,
-      reviewed,
+      drillAccuracy:
+        drillStats && drillStats.total > 0
+          ? Math.round((drillStats.correct / drillStats.total) * 100)
+          : null,
     };
   });
 
   return {
     totalCards: cards.length,
     dueCount: dueCards.length,
-    reviewedCount: cards.filter((card) => card.reps > 0).length,
+    streak: computeActivityStreak(activeDays),
     topicStats,
   };
 }

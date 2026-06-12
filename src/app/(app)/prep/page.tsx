@@ -12,7 +12,7 @@ export default async function PrepPage() {
     : {
         totalCards: 0,
         dueCount: 0,
-        reviewedCount: 0,
+        streak: 0,
         topicStats: [],
       };
 
@@ -20,7 +20,7 @@ export default async function PrepPage() {
     <div className="space-y-5">
       <PageHeader
         title="Prep"
-        description="Daily flashcard review and topic notes for DSA, system design patterns, and calm interview execution."
+        description="Flashcards and drills for pattern recognition."
       />
       <PrepDashboard {...data} />
     </div>

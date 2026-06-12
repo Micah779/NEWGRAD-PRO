@@ -114,6 +114,33 @@ export const prepCards = pgTable("prep_cards", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+export type DrillChoice = {
+  id: string;
+  label: string;
+};
+
+export const drillQuestions = pgTable("drill_questions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: text("slug").notNull().unique(),
+  topicSlug: text("topic_slug").notNull(),
+  topic: text("topic").notNull(),
+  scenario: text("scenario").notNull(),
+  choices: jsonb("choices").$type<DrillChoice[]>().notNull(),
+  correctChoiceId: text("correct_choice_id").notNull(),
+  explanation: text("explanation").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const drillAttempts = pgTable("drill_attempts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  questionId: uuid("question_id")
+    .notNull()
+    .references(() => drillQuestions.id, { onDelete: "cascade" }),
+  selectedChoiceId: text("selected_choice_id").notNull(),
+  correct: boolean("correct").notNull(),
+  attemptedAt: timestamp("attempted_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const scanRuns = pgTable("scan_runs", {
   id: uuid("id").defaultRandom().primaryKey(),
   startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
@@ -155,4 +182,6 @@ export type Application = typeof applications.$inferSelect;
 export type ApplicationEvent = typeof applicationEvents.$inferSelect;
 export type ScanRun = typeof scanRuns.$inferSelect;
 export type PrepCard = typeof prepCards.$inferSelect;
+export type DrillQuestion = typeof drillQuestions.$inferSelect;
+export type DrillAttempt = typeof drillAttempts.$inferSelect;
 export type ApplicationStage = (typeof applicationStageEnum.enumValues)[number];

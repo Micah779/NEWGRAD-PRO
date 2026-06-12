@@ -144,7 +144,7 @@ const TARGET_COMPANIES: Array<{ name: string; slugs: string[] }> = [
   { name: "Intuit", slugs: ["intuit"] },
 ];
 
-const HEADERS = { "User-Agent": "NewGradPro-Discovery/1.0" };
+const HEADERS = { "User-Agent": "Scout-Discovery/1.0" };
 
 async function probeGreenhouse(slug: string): Promise<number | null> {
   try {

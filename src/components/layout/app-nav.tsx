@@ -32,7 +32,7 @@ export function AppNav() {
             className={cn(
               "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               active
-                ? "bg-black/[0.06] text-[var(--foreground)]"
+                ? "bg-[var(--accent-soft)] text-[var(--accent)]"
                 : "text-[var(--muted)] hover:bg-black/[0.04] hover:text-[var(--foreground)]",
             )}
           >

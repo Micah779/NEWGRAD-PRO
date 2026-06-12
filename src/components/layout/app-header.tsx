@@ -7,8 +7,8 @@ export function AppHeader() {
     <header className="sticky top-0 z-40 border-b border-black/[0.06] bg-[var(--background)]/90 backdrop-blur-xl safe-top">
       <div className="mx-auto flex h-[var(--header-height)] max-w-3xl items-center justify-between px-4 sm:max-w-5xl lg:max-w-6xl">
         <div className="min-w-0">
-          <p className="truncate text-[15px] font-semibold tracking-tight text-[var(--foreground)]">
-            NewGrad Pro
+          <p className="truncate font-mono text-[15px] font-medium tracking-tight text-[var(--foreground)]">
+            scout<span className="text-[var(--accent)]">.</span>
           </p>
         </div>
 

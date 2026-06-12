@@ -14,7 +14,8 @@ export function scheduleReview(
   grade: ReviewGrade,
   now = new Date(),
 ): SrsState & { dueAt: Date } {
-  let { reps, ease, intervalDays } = state;
+  let { reps, ease } = state;
+  const { intervalDays } = state;
   let nextInterval = intervalDays;
 
   if (grade === "again") {
