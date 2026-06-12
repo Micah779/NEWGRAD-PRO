@@ -20,7 +20,7 @@ CREATE TABLE "practice_problems" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "practice_problems_slug_unique" UNIQUE("slug")
 );
-
+--> statement-breakpoint
 CREATE TABLE "practice_attempts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"problem_id" uuid NOT NULL,
@@ -29,5 +29,5 @@ CREATE TABLE "practice_attempts" (
 	"correct" boolean NOT NULL,
 	"attempted_at" timestamp with time zone DEFAULT now() NOT NULL
 );
-
+--> statement-breakpoint
 ALTER TABLE "practice_attempts" ADD CONSTRAINT "practice_attempts_problem_id_practice_problems_id_fk" FOREIGN KEY ("problem_id") REFERENCES "public"."practice_problems"("id") ON DELETE cascade ON UPDATE no action;
