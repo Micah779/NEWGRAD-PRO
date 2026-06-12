@@ -1,0 +1,448 @@
+{
+  "hits": [
+    {
+      "company": "SeatGeek",
+      "ats": "greenhouse",
+      "slug": "seatgeek",
+      "jobCount": 22
+    },
+    {
+      "company": "Google DeepMind",
+      "ats": "greenhouse",
+      "slug": "deepmind",
+      "jobCount": 38
+    },
+    {
+      "company": "Affirm",
+      "ats": "greenhouse",
+      "slug": "affirm",
+      "jobCount": 158
+    },
+    {
+      "company": "Ironclad",
+      "ats": "ashby",
+      "slug": "ironcladhq",
+      "jobCount": 43
+    },
+    {
+      "company": "Stilta",
+      "ats": "ashby",
+      "slug": "stilta",
+      "jobCount": 3
+    },
+    {
+      "company": "Shapes Inc",
+      "ats": "ashby",
+      "slug": "shapes",
+      "jobCount": 7
+    },
+    {
+      "company": "GridCARE",
+      "ats": "ashby",
+      "slug": "gridcare",
+      "jobCount": 12
+    },
+    {
+      "company": "Cerebras",
+      "ats": "ashby",
+      "slug": "cerebras",
+      "jobCount": 105
+    },
+    {
+      "company": "Pindrop",
+      "ats": "greenhouse",
+      "slug": "pindropsecurity",
+      "jobCount": 17
+    },
+    {
+      "company": "GSK",
+      "ats": "workday",
+      "slug": "gsk",
+      "jobCount": 721,
+      "workday": {
+        "tenant": "gsk",
+        "site": "GSKCareers",
+        "wdInstance": "wd5"
+      }
+    },
+    {
+      "company": "Engine",
+      "ats": "greenhouse",
+      "slug": "engine",
+      "jobCount": 58
+    },
+    {
+      "company": "Linear",
+      "ats": "ashby",
+      "slug": "linear",
+      "jobCount": 25
+    },
+    {
+      "company": "Supercell",
+      "ats": "ashby",
+      "slug": "supercell",
+      "jobCount": 36
+    },
+    {
+      "company": "Monk",
+      "ats": "ashby",
+      "slug": "monk",
+      "jobCount": 6
+    },
+    {
+      "company": "PathAI",
+      "ats": "greenhouse",
+      "slug": "pathai",
+      "jobCount": 9
+    },
+    {
+      "company": "Parallel Web Systems",
+      "ats": "greenhouse",
+      "slug": "parallel",
+      "jobCount": 10
+    },
+    {
+      "company": "Greptile",
+      "ats": "ashby",
+      "slug": "greptile",
+      "jobCount": 3
+    },
+    {
+      "company": "Dust",
+      "ats": "ashby",
+      "slug": "dust",
+      "jobCount": 26
+    },
+    {
+      "company": "Geordie AI",
+      "ats": "ashby",
+      "slug": "geordieai",
+      "jobCount": 7
+    },
+    {
+      "company": "DualEntry",
+      "ats": "ashby",
+      "slug": "dualentry",
+      "jobCount": 32
+    },
+    {
+      "company": "Traversal",
+      "ats": "ashby",
+      "slug": "traversal",
+      "jobCount": 9
+    },
+    {
+      "company": "Peec AI",
+      "ats": "ashby",
+      "slug": "peec",
+      "jobCount": 43
+    },
+    {
+      "company": "Serval",
+      "ats": "ashby",
+      "slug": "serval",
+      "jobCount": 34
+    },
+    {
+      "company": "Reducto",
+      "ats": "ashby",
+      "slug": "reducto",
+      "jobCount": 34
+    },
+    {
+      "company": "Iru",
+      "ats": "lever",
+      "slug": "iru",
+      "jobCount": 1
+    },
+    {
+      "company": "Smartsheet",
+      "ats": "greenhouse",
+      "slug": "smartsheet",
+      "jobCount": 102
+    },
+    {
+      "company": "Rho",
+      "ats": "ashby",
+      "slug": "rho",
+      "jobCount": 29
+    },
+    {
+      "company": "Aaru",
+      "ats": "ashby",
+      "slug": "aaru",
+      "jobCount": 14
+    },
+    {
+      "company": "Cohere",
+      "ats": "ashby",
+      "slug": "cohere",
+      "jobCount": 122
+    },
+    {
+      "company": "Cloudflare",
+      "ats": "greenhouse",
+      "slug": "cloudflare",
+      "jobCount": 185
+    },
+    {
+      "company": "Accenture",
+      "ats": "workday",
+      "slug": "accenture",
+      "jobCount": 2000,
+      "workday": {
+        "tenant": "accenture",
+        "site": "AccentureCareers",
+        "wdInstance": "wd103"
+      }
+    },
+    {
+      "company": "Figure",
+      "ats": "greenhouse",
+      "slug": "figureai",
+      "jobCount": 103
+    },
+    {
+      "company": "The Better Money Company",
+      "ats": "ashby",
+      "slug": "bettermoney",
+      "jobCount": 7
+    },
+    {
+      "company": "Mariana Minerals",
+      "ats": "ashby",
+      "slug": "marianaminerals",
+      "jobCount": 54
+    },
+    {
+      "company": "Concourse",
+      "ats": "ashby",
+      "slug": "concourse",
+      "jobCount": 12
+    },
+    {
+      "company": "Fiserv",
+      "ats": "workday",
+      "slug": "fiserv",
+      "jobCount": 462,
+      "workday": {
+        "tenant": "fiserv",
+        "site": "EXT",
+        "wdInstance": "wd5"
+      }
+    },
+    {
+      "company": "Lio",
+      "ats": "ashby",
+      "slug": "lio",
+      "jobCount": 29
+    },
+    {
+      "company": "Braintrust",
+      "ats": "ashby",
+      "slug": "braintrust",
+      "jobCount": 28
+    },
+    {
+      "company": "Protege",
+      "ats": "ashby",
+      "slug": "protege",
+      "jobCount": 17
+    },
+    {
+      "company": "Nexxa.ai",
+      "ats": "ashby",
+      "slug": "nexxa",
+      "jobCount": 8
+    },
+    {
+      "company": "Sentra",
+      "ats": "ashby",
+      "slug": "sentra",
+      "jobCount": 3
+    },
+    {
+      "company": "Phylo",
+      "ats": "ashby",
+      "slug": "phylo",
+      "jobCount": 7
+    },
+    {
+      "company": "Mega",
+      "ats": "lever",
+      "slug": "mega",
+      "jobCount": 1
+    },
+    {
+      "company": "Dex",
+      "ats": "ashby",
+      "slug": "dex",
+      "jobCount": 2
+    },
+    {
+      "company": "Vanta",
+      "ats": "ashby",
+      "slug": "vanta",
+      "jobCount": 112
+    },
+    {
+      "company": "Composio",
+      "ats": "ashby",
+      "slug": "composio",
+      "jobCount": 24
+    },
+    {
+      "company": "Reflex",
+      "ats": "greenhouse",
+      "slug": "reflex",
+      "jobCount": 3
+    },
+    {
+      "company": "Liquid AI",
+      "ats": "ashby",
+      "slug": "liquid",
+      "jobCount": 9
+    },
+    {
+      "company": "Hightouch",
+      "ats": "greenhouse",
+      "slug": "hightouch",
+      "jobCount": 68
+    },
+    {
+      "company": "Actively AI",
+      "ats": "greenhouse",
+      "slug": "activelyai",
+      "jobCount": 24
+    },
+    {
+      "company": "Reflection AI",
+      "ats": "ashby",
+      "slug": "reflectionai",
+      "jobCount": 51
+    },
+    {
+      "company": "LPL Financial",
+      "ats": "greenhouse",
+      "slug": "lpl",
+      "jobCount": 11
+    },
+    {
+      "company": "Maybern",
+      "ats": "ashby",
+      "slug": "maybern",
+      "jobCount": 17
+    },
+    {
+      "company": "Yugabyte",
+      "ats": "greenhouse",
+      "slug": "yugabyte",
+      "jobCount": 29
+    },
+    {
+      "company": "SingleStore",
+      "ats": "greenhouse",
+      "slug": "singlestore",
+      "jobCount": 47
+    },
+    {
+      "company": "Redis",
+      "ats": "ashby",
+      "slug": "redis",
+      "jobCount": 74
+    },
+    {
+      "company": "Cockroach Labs",
+      "ats": "greenhouse",
+      "slug": "cockroachlabs",
+      "jobCount": 35
+    },
+    {
+      "company": "PlanetScale",
+      "ats": "greenhouse",
+      "slug": "planetscale",
+      "jobCount": 12
+    },
+    {
+      "company": "Y Combinator",
+      "ats": "ashby",
+      "slug": "ycombinator",
+      "jobCount": 5
+    },
+    {
+      "company": "Twilio",
+      "ats": "greenhouse",
+      "slug": "twilio",
+      "jobCount": 149
+    },
+    {
+      "company": "Rillet",
+      "ats": "ashby",
+      "slug": "rillet",
+      "jobCount": 25
+    },
+    {
+      "company": "Veeva Systems",
+      "ats": "lever",
+      "slug": "veeva",
+      "jobCount": 1
+    }
+  ],
+  "misses": [
+    "Autosana",
+    "Config",
+    "Stitch",
+    "Balyasny Asset Management",
+    "Lindy",
+    "o11",
+    "Oddpool",
+    "Check",
+    "Human Delta",
+    "HF0",
+    "N47",
+    "Raindrop",
+    "Nutanix",
+    "Revyl",
+    "Ardent",
+    "Emergent",
+    "Resolve AI",
+    "Futures First",
+    "fileAI",
+    "Arcana",
+    "Shaped",
+    "Vizient",
+    "micro1",
+    "Viasat",
+    "Qdrant",
+    "Eclypsium",
+    "NetApp",
+    "OpenGradient",
+    "Handle",
+    "Meridian AI",
+    "Hilbert",
+    "Babylon Labs",
+    "Treeline",
+    "Pillar",
+    "GitButler",
+    "Preset",
+    "QuiverAI",
+    "Pluvo",
+    "UpSmith",
+    "Stoke Space",
+    "Haladir",
+    "Synchrony",
+    "Airbase",
+    "You.com",
+    "Luma",
+    "Hyperliquid",
+    "Driver",
+    "Everpure",
+    "QuestDB",
+    "TradersPost",
+    "Clark Associates",
+    "Timebeat",
+    "OfferPilot",
+    "Afterprime",
+    "Palo Alto Networks"
+  ]
+}
