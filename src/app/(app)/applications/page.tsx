@@ -1,13 +1,18 @@
+import { eq } from "drizzle-orm";
 import { getDataDb } from "@/lib/data";
+import { requireUserEmail } from "@/lib/session";
+import { applications } from "@/db/schema";
 import { PipelineBoard } from "@/components/applications/pipeline-board";
 import { PageHeader } from "@/components/layout/page-header";
 
 export const dynamic = "force-dynamic";
 
 export default async function ApplicationsPage() {
+  const userEmail = await requireUserEmail();
   const db = getDataDb();
   const rows = db
     ? await db.query.applications.findMany({
+        where: eq(applications.userEmail, userEmail),
         with: {
           events: true,
         },

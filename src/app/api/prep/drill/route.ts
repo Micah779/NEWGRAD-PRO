@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
-import { getDataDb } from "@/lib/data";
 import { drillQuestions } from "@/db/schema";
+import { getDataDb } from "@/lib/data";
 import { buildDrillSession, recordDrillAttempt } from "@/lib/drill";
+import { getSessionUserEmail } from "@/lib/session";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const topicSlug = url.searchParams.get("topic") ?? undefined;
-  const questions = await buildDrillSession(db, topicSlug);
+  const questions = await buildDrillSession(db, userEmail, topicSlug);
 
   return NextResponse.json({
     questions: questions.map((question) => ({
@@ -40,8 +40,8 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -66,6 +66,7 @@ export async function POST(request: Request) {
   const correct = parsed.data.selectedChoiceId === question.correctChoiceId;
   await recordDrillAttempt(
     db,
+    userEmail,
     question.id,
     parsed.data.selectedChoiceId,
     correct,

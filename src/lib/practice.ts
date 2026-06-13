@@ -3,6 +3,10 @@ import type { Db } from "@/db";
 import { practiceAttempts, practiceProblems } from "@/db/schema";
 import type { DrillChoice } from "@/db/schema";
 import { isDueAtOrBefore } from "@/lib/central-time";
+import {
+  getProblemsWithProgress,
+  upsertPracticeProblemProgress,
+} from "@/lib/progress";
 import { scheduleReview, type ReviewGrade } from "@/lib/srs";
 
 export type SafePracticeProblem = {
@@ -42,16 +46,16 @@ export function deriveSuggestedGrade(
 
 export async function getDuePracticeProblems(
   db: Db,
+  userEmail: string,
   topicSlug?: string,
 ): Promise<SafePracticeProblem[]> {
   const now = new Date();
-  const problems = await db.query.practiceProblems.findMany({
-    orderBy: (table, { asc }) => [asc(table.dueAt)],
-  });
+  const problems = await getProblemsWithProgress(db, userEmail);
 
   const filtered = problems
     .filter((problem) => isDueAtOrBefore(problem.dueAt, now))
-    .filter((problem) => !topicSlug || problem.topicSlug === topicSlug);
+    .filter((problem) => !topicSlug || problem.topicSlug === topicSlug)
+    .sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime());
 
   return filtered.map((problem) => ({
     id: problem.id,
@@ -88,6 +92,7 @@ export async function getPracticeProblemForStage(
 
 export async function gradePracticeStage(
   db: Db,
+  userEmail: string,
   problemId: string,
   stage: 1 | 2,
   selectedChoiceId: string,
@@ -107,6 +112,7 @@ export async function gradePracticeStage(
 
   await db.insert(practiceAttempts).values({
     problemId,
+    userEmail,
     stage,
     selectedChoiceId,
     correct,
@@ -137,12 +143,12 @@ export async function gradePracticeStage(
 
 export async function completePracticeProblem(
   db: Db,
+  userEmail: string,
   problemId: string,
   grade: ReviewGrade,
 ) {
-  const problem = await db.query.practiceProblems.findFirst({
-    where: eq(practiceProblems.id, problemId),
-  });
+  const problems = await getProblemsWithProgress(db, userEmail);
+  const problem = problems.find((entry) => entry.id === problemId);
 
   if (!problem) return null;
 
@@ -157,23 +163,21 @@ export async function completePracticeProblem(
     now,
   );
 
-  const [updated] = await db
-    .update(practiceProblems)
-    .set({
-      reps: next.reps,
-      ease: next.ease,
-      intervalDays: next.intervalDays,
-      dueAt: next.dueAt,
-      lastReviewedAt: now,
-    })
-    .where(eq(practiceProblems.id, problemId))
-    .returning();
+  const updated = await upsertPracticeProblemProgress(db, problemId, userEmail, {
+    ...next,
+    lastReviewedAt: now,
+  });
 
-  return updated;
+  return {
+    id: problemId,
+    reps: updated.reps,
+    dueAt: updated.dueAt,
+  };
 }
 
 export async function getTopicPracticeAccuracy(
   db: Db,
+  userEmail: string,
 ): Promise<Map<string, { correct: number; total: number }>> {
   const attempts = await db
     .select({
@@ -184,7 +188,8 @@ export async function getTopicPracticeAccuracy(
     .innerJoin(
       practiceProblems,
       eq(practiceAttempts.problemId, practiceProblems.id),
-    );
+    )
+    .where(eq(practiceAttempts.userEmail, userEmail));
 
   const stats = new Map<string, { correct: number; total: number }>();
 

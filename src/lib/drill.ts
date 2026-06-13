@@ -52,6 +52,7 @@ function scoreQuestion(
 
 export async function buildDrillSession(
   db: Db,
+  userEmail: string,
   topicSlug?: string,
 ): Promise<DrillSessionQuestion[]> {
   const questions = await db.query.drillQuestions.findMany({
@@ -69,6 +70,7 @@ export async function buildDrillSession(
       attemptedAt: drillAttempts.attemptedAt,
     })
     .from(drillAttempts)
+    .where(eq(drillAttempts.userEmail, userEmail))
     .orderBy(desc(drillAttempts.attemptedAt));
 
   const attemptsByQuestion = new Map<string, { correct: boolean; attemptedAt: Date }[]>();
@@ -122,6 +124,7 @@ export async function buildDrillSession(
 
 export async function recordDrillAttempt(
   db: Db,
+  userEmail: string,
   questionId: string,
   selectedChoiceId: string,
   correct: boolean,
@@ -130,6 +133,7 @@ export async function recordDrillAttempt(
     .insert(drillAttempts)
     .values({
       questionId,
+      userEmail,
       selectedChoiceId,
       correct,
     })
@@ -140,6 +144,7 @@ export async function recordDrillAttempt(
 
 export async function getTopicDrillAccuracy(
   db: Db,
+  userEmail: string,
 ): Promise<Map<string, { correct: number; total: number }>> {
   const attempts = await db
     .select({
@@ -147,7 +152,8 @@ export async function getTopicDrillAccuracy(
       correct: drillAttempts.correct,
     })
     .from(drillAttempts)
-    .innerJoin(drillQuestions, eq(drillAttempts.questionId, drillQuestions.id));
+    .innerJoin(drillQuestions, eq(drillAttempts.questionId, drillQuestions.id))
+    .where(eq(drillAttempts.userEmail, userEmail));
 
   const stats = new Map<string, { correct: number; total: number }>();
 

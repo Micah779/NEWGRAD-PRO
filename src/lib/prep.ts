@@ -1,22 +1,29 @@
+import { eq } from "drizzle-orm";
 import type { Db } from "@/db";
-import { drillAttempts, practiceProblems, prepCards } from "@/db/schema";
+import { drillAttempts } from "@/db/schema";
 import { PREP_TOPICS } from "@/db/prep-catalog";
 import { formatCentralDay, isDueAtOrBefore } from "@/lib/central-time";
 import { computeActivityStreak, getTopicDrillAccuracy } from "@/lib/drill";
+import { getCardsWithProgress, getProblemsWithProgress } from "@/lib/progress";
 import { getTopicPracticeAccuracy } from "@/lib/practice";
 
-export async function getPrepDashboardData(db: Db) {
+export async function getPrepDashboardData(db: Db, userEmail: string) {
   const now = new Date();
   const [cards, problems, drillAttemptDates] = await Promise.all([
-    db.select().from(prepCards),
-    db.select().from(practiceProblems),
-    db.select({ attemptedAt: drillAttempts.attemptedAt }).from(drillAttempts),
+    getCardsWithProgress(db, userEmail),
+    getProblemsWithProgress(db, userEmail),
+    db
+      .select({ attemptedAt: drillAttempts.attemptedAt })
+      .from(drillAttempts)
+      .where(eq(drillAttempts.userEmail, userEmail)),
   ]);
 
   const dueCards = cards.filter((card) => isDueAtOrBefore(card.dueAt, now));
-  const dueProblems = problems.filter((problem) => isDueAtOrBefore(problem.dueAt, now));
-  const drillAccuracy = await getTopicDrillAccuracy(db);
-  const practiceAccuracy = await getTopicPracticeAccuracy(db);
+  const dueProblems = problems.filter((problem) =>
+    isDueAtOrBefore(problem.dueAt, now),
+  );
+  const drillAccuracy = await getTopicDrillAccuracy(db, userEmail);
+  const practiceAccuracy = await getTopicPracticeAccuracy(db, userEmail);
 
   const activeDays = new Set<string>();
   for (const card of cards) {
@@ -72,8 +79,8 @@ export async function getPrepDashboardData(db: Db) {
   };
 }
 
-export async function getDueCardCount(db: Db) {
-  const cards = await db.select({ dueAt: prepCards.dueAt }).from(prepCards);
+export async function getDueCardCount(db: Db, userEmail: string) {
+  const cards = await getCardsWithProgress(db, userEmail);
   const now = new Date();
   return cards.filter((card) => isDueAtOrBefore(card.dueAt, now)).length;
 }

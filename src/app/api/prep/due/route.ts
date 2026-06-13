@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { getDataDb } from "@/lib/data";
-import { prepCards } from "@/db/schema";
+import { getCardsWithProgress } from "@/lib/progress";
 import { isDueAtOrBefore } from "@/lib/central-time";
+import { getSessionUserEmail } from "@/lib/session";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -19,13 +19,12 @@ export async function GET(request: Request) {
   const topicSlug = url.searchParams.get("topic");
 
   const now = new Date();
-  const cards = await db.query.prepCards.findMany({
-    orderBy: (table, { asc }) => [asc(table.dueAt)],
-  });
+  const cards = await getCardsWithProgress(db, userEmail);
 
   const filtered = cards
     .filter((card) => isDueAtOrBefore(card.dueAt, now))
-    .filter((card) => !topicSlug || card.topicSlug === topicSlug);
+    .filter((card) => !topicSlug || card.topicSlug === topicSlug)
+    .sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime());
 
   return NextResponse.json({
     cards: filtered.map((card) => ({

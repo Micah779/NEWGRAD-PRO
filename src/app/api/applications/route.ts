@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { getDb } from "@/db";
 import { markListingApplied } from "@/scan/engine";
+import { getSessionUserEmail } from "@/lib/session";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -10,8 +10,8 @@ const createSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     const application = await markListingApplied(
       db,
       body.listingId,
+      userEmail,
       body.notes,
     );
     return NextResponse.json(application, { status: 201 });

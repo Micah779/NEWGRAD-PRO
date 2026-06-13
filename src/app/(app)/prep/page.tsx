@@ -1,14 +1,16 @@
 import { getDataDb } from "@/lib/data";
 import { getPrepDashboardData } from "@/lib/prep";
+import { requireUserEmail } from "@/lib/session";
 import { PrepDashboard } from "@/components/prep/prep-dashboard";
 import { PageHeader } from "@/components/layout/page-header";
 
 export const dynamic = "force-dynamic";
 
 export default async function PrepPage() {
+  const userEmail = await requireUserEmail();
   const db = getDataDb();
   const data = db
-    ? await getPrepDashboardData(db)
+    ? await getPrepDashboardData(db, userEmail)
     : {
         totalCards: 0,
         dueCount: 0,

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
 import { getDataDb } from "@/lib/data";
 import {
   completePracticeProblem,
@@ -8,6 +7,7 @@ import {
   getPracticeProblemForStage,
   gradePracticeStage,
 } from "@/lib/practice";
+import { getSessionUserEmail } from "@/lib/session";
 
 const gradeSchema = z.object({
   action: z.literal("grade"),
@@ -26,8 +26,8 @@ const completeSchema = z.object({
 const bodySchema = z.discriminatedUnion("action", [gradeSchema, completeSchema]);
 
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -71,7 +71,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ choices: stageData.choices });
   }
 
-  const problems = await getDuePracticeProblems(db, topicSlug);
+  const problems = await getDuePracticeProblems(db, userEmail, topicSlug);
 
   return NextResponse.json({
     problems,
@@ -80,8 +80,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -98,6 +98,7 @@ export async function POST(request: Request) {
   if (parsed.data.action === "grade") {
     const feedback = await gradePracticeStage(
       db,
+      userEmail,
       parsed.data.problemId,
       parsed.data.stage,
       parsed.data.selectedChoiceId,
@@ -113,6 +114,7 @@ export async function POST(request: Request) {
 
   const updated = await completePracticeProblem(
     db,
+    userEmail,
     parsed.data.problemId,
     parsed.data.grade,
   );

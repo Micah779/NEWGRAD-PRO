@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
-import { getDataDb } from "@/lib/data";
 import { prepCards } from "@/db/schema";
+import { getDataDb } from "@/lib/data";
+import { getCardsWithProgress, upsertPrepCardProgress } from "@/lib/progress";
+import { getSessionUserEmail } from "@/lib/session";
 import { scheduleReview, type ReviewGrade } from "@/lib/srs";
 
 const bodySchema = z.object({
@@ -12,8 +13,8 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -35,32 +36,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Card not found" }, { status: 404 });
   }
 
+  const cardsWithProgress = await getCardsWithProgress(db, userEmail);
+  const current = cardsWithProgress.find((entry) => entry.id === card.id);
+
+  if (!current) {
+    return NextResponse.json({ error: "Card not found" }, { status: 404 });
+  }
+
   const now = new Date();
   const next = scheduleReview(
     {
-      reps: card.reps,
-      ease: card.ease,
-      intervalDays: card.intervalDays,
+      reps: current.reps,
+      ease: current.ease,
+      intervalDays: current.intervalDays,
     },
     parsed.data.grade as ReviewGrade,
     now,
   );
 
-  const [updated] = await db
-    .update(prepCards)
-    .set({
-      reps: next.reps,
-      ease: next.ease,
-      intervalDays: next.intervalDays,
-      dueAt: next.dueAt,
-      lastReviewedAt: now,
-    })
-    .where(eq(prepCards.id, card.id))
-    .returning();
+  const updated = await upsertPrepCardProgress(db, card.id, userEmail, {
+    ...next,
+    lastReviewedAt: now,
+  });
 
   return NextResponse.json({
     card: {
-      id: updated.id,
+      id: card.id,
       reps: updated.reps,
       ease: updated.ease,
       intervalDays: updated.intervalDays,

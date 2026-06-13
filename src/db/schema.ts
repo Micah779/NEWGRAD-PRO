@@ -66,20 +66,27 @@ export const jobListings = pgTable(
   ],
 );
 
-export const applications = pgTable("applications", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  listingId: uuid("listing_id")
-    .notNull()
-    .references(() => jobListings.id, { onDelete: "cascade" }),
-  stage: applicationStageEnum("stage").notNull().default("applied"),
-  appliedAt: timestamp("applied_at", { withTimezone: true }).defaultNow().notNull(),
-  notes: text("notes"),
-  snapshotTitle: text("snapshot_title").notNull(),
-  snapshotUrl: text("snapshot_url").notNull(),
-  snapshotCompany: text("snapshot_company").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-});
+export const applications = pgTable(
+  "applications",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    listingId: uuid("listing_id")
+      .notNull()
+      .references(() => jobListings.id, { onDelete: "cascade" }),
+    userEmail: text("user_email").notNull(),
+    stage: applicationStageEnum("stage").notNull().default("applied"),
+    appliedAt: timestamp("applied_at", { withTimezone: true }).defaultNow().notNull(),
+    notes: text("notes"),
+    snapshotTitle: text("snapshot_title").notNull(),
+    snapshotUrl: text("snapshot_url").notNull(),
+    snapshotCompany: text("snapshot_company").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("applications_listing_user_idx").on(table.listingId, table.userEmail),
+  ],
+);
 
 export const applicationEvents = pgTable("application_events", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -106,13 +113,27 @@ export const prepCards = pgTable("prep_cards", {
   topic: text("topic").notNull(),
   front: text("front").notNull(),
   back: text("back").notNull(),
-  reps: integer("reps").notNull().default(0),
-  ease: real("ease").notNull().default(2.5),
-  intervalDays: integer("interval_days").notNull().default(0),
-  dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
-  lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const prepCardProgress = pgTable(
+  "prep_card_progress",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    cardId: uuid("card_id")
+      .notNull()
+      .references(() => prepCards.id, { onDelete: "cascade" }),
+    userEmail: text("user_email").notNull(),
+    reps: integer("reps").notNull().default(0),
+    ease: real("ease").notNull().default(2.5),
+    intervalDays: integer("interval_days").notNull().default(0),
+    dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
+    lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("prep_card_progress_card_user_idx").on(table.cardId, table.userEmail),
+  ],
+);
 
 export type DrillChoice = {
   id: string;
@@ -136,6 +157,7 @@ export const drillAttempts = pgTable("drill_attempts", {
   questionId: uuid("question_id")
     .notNull()
     .references(() => drillQuestions.id, { onDelete: "cascade" }),
+  userEmail: text("user_email").notNull(),
   selectedChoiceId: text("selected_choice_id").notNull(),
   correct: boolean("correct").notNull(),
   attemptedAt: timestamp("attempted_at", { withTimezone: true }).defaultNow().notNull(),
@@ -155,19 +177,37 @@ export const practiceProblems = pgTable("practice_problems", {
   complexityChoices: jsonb("complexity_choices").$type<DrillChoice[]>().notNull(),
   correctComplexityChoiceId: text("correct_complexity_choice_id").notNull(),
   complexityExplanation: text("complexity_explanation").notNull(),
-  reps: integer("reps").notNull().default(0),
-  ease: real("ease").notNull().default(2.5),
-  intervalDays: integer("interval_days").notNull().default(0),
-  dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
-  lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const practiceProblemProgress = pgTable(
+  "practice_problem_progress",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    problemId: uuid("problem_id")
+      .notNull()
+      .references(() => practiceProblems.id, { onDelete: "cascade" }),
+    userEmail: text("user_email").notNull(),
+    reps: integer("reps").notNull().default(0),
+    ease: real("ease").notNull().default(2.5),
+    intervalDays: integer("interval_days").notNull().default(0),
+    dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
+    lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("practice_problem_progress_problem_user_idx").on(
+      table.problemId,
+      table.userEmail,
+    ),
+  ],
+);
 
 export const practiceAttempts = pgTable("practice_attempts", {
   id: uuid("id").defaultRandom().primaryKey(),
   problemId: uuid("problem_id")
     .notNull()
     .references(() => practiceProblems.id, { onDelete: "cascade" }),
+  userEmail: text("user_email").notNull(),
   stage: integer("stage").notNull(),
   selectedChoiceId: text("selected_choice_id").notNull(),
   correct: boolean("correct").notNull(),
@@ -209,14 +249,41 @@ export const applicationEventsRelations = relations(applicationEvents, ({ one })
   }),
 }));
 
+export const prepCardsRelations = relations(prepCards, ({ many }) => ({
+  progress: many(prepCardProgress),
+}));
+
+export const prepCardProgressRelations = relations(prepCardProgress, ({ one }) => ({
+  card: one(prepCards, {
+    fields: [prepCardProgress.cardId],
+    references: [prepCards.id],
+  }),
+}));
+
+export const practiceProblemsRelations = relations(practiceProblems, ({ many }) => ({
+  progress: many(practiceProblemProgress),
+}));
+
+export const practiceProblemProgressRelations = relations(
+  practiceProblemProgress,
+  ({ one }) => ({
+    problem: one(practiceProblems, {
+      fields: [practiceProblemProgress.problemId],
+      references: [practiceProblems.id],
+    }),
+  }),
+);
+
 export type Company = typeof companies.$inferSelect;
 export type JobListing = typeof jobListings.$inferSelect;
 export type Application = typeof applications.$inferSelect;
 export type ApplicationEvent = typeof applicationEvents.$inferSelect;
 export type ScanRun = typeof scanRuns.$inferSelect;
 export type PrepCard = typeof prepCards.$inferSelect;
+export type PrepCardProgress = typeof prepCardProgress.$inferSelect;
 export type DrillQuestion = typeof drillQuestions.$inferSelect;
 export type DrillAttempt = typeof drillAttempts.$inferSelect;
 export type PracticeProblem = typeof practiceProblems.$inferSelect;
+export type PracticeProblemProgress = typeof practiceProblemProgress.$inferSelect;
 export type PracticeAttempt = typeof practiceAttempts.$inferSelect;
 export type ApplicationStage = (typeof applicationStageEnum.enumValues)[number];

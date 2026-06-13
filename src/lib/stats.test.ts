@@ -14,6 +14,7 @@ function makeApplication(
   return {
     id: "app-1",
     listingId: "listing-1",
+    userEmail: "user@example.com",
     stage: "applied" as const,
     appliedAt: new Date("2026-01-01"),
     notes: null,

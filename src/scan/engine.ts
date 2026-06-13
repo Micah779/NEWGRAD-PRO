@@ -228,12 +228,14 @@ export async function getLatestScanRun(db: Db) {
   return latest ?? null;
 }
 
-export async function getActiveListings(db: Db) {
+export async function getActiveListings(db: Db, userEmail: string) {
   return db.query.jobListings.findMany({
     where: eq(jobListings.status, "active"),
     with: {
       company: true,
-      applications: true,
+      applications: {
+        where: eq(applications.userEmail, userEmail),
+      },
     },
     orderBy: (listings, { desc }) => [desc(listings.firstSeenAt)],
   });
@@ -256,11 +258,17 @@ export async function getCompaniesWithScanStatus(db: Db) {
 export async function markListingApplied(
   db: Db,
   listingId: string,
+  userEmail: string,
   notes?: string,
 ) {
   const listing = await db.query.jobListings.findFirst({
     where: eq(jobListings.id, listingId),
-    with: { company: true, applications: true },
+    with: {
+      company: true,
+      applications: {
+        where: eq(applications.userEmail, userEmail),
+      },
+    },
   });
 
   if (!listing) {
@@ -275,6 +283,7 @@ export async function markListingApplied(
     .insert(applications)
     .values({
       listingId: listing.id,
+      userEmail,
       stage: "applied",
       notes: notes ?? null,
       snapshotTitle: listing.title,

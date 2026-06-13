@@ -1,4 +1,5 @@
 import { getDataDb } from "@/lib/data";
+import { requireUserEmail } from "@/lib/session";
 import { getActiveListings, getLatestScanRun } from "@/scan/engine";
 import { JobsBoard } from "@/components/jobs/jobs-board";
 import { ScanStatus } from "@/components/jobs/scan-status";
@@ -7,9 +8,10 @@ import { PageHeader } from "@/components/layout/page-header";
 export const dynamic = "force-dynamic";
 
 export default async function JobsPage() {
+  const userEmail = await requireUserEmail();
   const db = getDataDb();
   const [listings, latestScan] = db
-    ? await Promise.all([getActiveListings(db), getLatestScanRun(db)])
+    ? await Promise.all([getActiveListings(db, userEmail), getLatestScanRun(db)])
     : [[], null];
 
   const serialized = listings.map((listing) => ({

@@ -1,13 +1,7 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-
-function getAllowedEmails() {
-  return (process.env.ALLOWED_EMAILS ?? "")
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean);
-}
+import { getAllowedEmails } from "@/lib/session";
 
 const providers = [];
 

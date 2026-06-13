@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
 import { getDb } from "@/db";
 import { applicationEvents, applications } from "@/db/schema";
+import { getSessionUserEmail } from "@/lib/session";
 
 const updateSchema = z.object({
   stage: z.enum([
@@ -22,8 +22,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await auth();
-  if (!session?.user) {
+  const userEmail = await getSessionUserEmail();
+  if (!userEmail) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -36,7 +36,7 @@ export async function PATCH(
     const [existing] = await db
       .select()
       .from(applications)
-      .where(eq(applications.id, id))
+      .where(and(eq(applications.id, id), eq(applications.userEmail, userEmail)))
       .limit(1);
 
     if (!existing) {
