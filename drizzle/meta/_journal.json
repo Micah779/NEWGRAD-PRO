@@ -43,6 +43,13 @@
       "when": 1718582400000,
       "tag": "0005_user_scoping",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1718668800000,
+      "tag": "0006_prep_lifetime_counts",
+      "breakpoints": true
     }
   ]
 }
