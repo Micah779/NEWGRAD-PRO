@@ -129,6 +129,7 @@ export const prepCardProgress = pgTable(
     intervalDays: integer("interval_days").notNull().default(0),
     dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
     lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+    reviewCount: integer("review_count").notNull().default(0),
   },
   (table) => [
     uniqueIndex("prep_card_progress_card_user_idx").on(table.cardId, table.userEmail),
@@ -193,6 +194,7 @@ export const practiceProblemProgress = pgTable(
     intervalDays: integer("interval_days").notNull().default(0),
     dueAt: timestamp("due_at", { withTimezone: true }).defaultNow().notNull(),
     lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
+    completionCount: integer("completion_count").notNull().default(0),
   },
   (table) => [
     uniqueIndex("practice_problem_progress_problem_user_idx").on(

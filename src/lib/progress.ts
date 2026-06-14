@@ -158,6 +158,7 @@ export async function upsertPrepCardProgress(
         intervalDays: next.intervalDays,
         dueAt: next.dueAt,
         lastReviewedAt: next.lastReviewedAt,
+        reviewCount: existing.reviewCount + 1,
       })
       .where(eq(prepCardProgress.id, existing.id))
       .returning();
@@ -174,6 +175,7 @@ export async function upsertPrepCardProgress(
       intervalDays: next.intervalDays,
       dueAt: next.dueAt,
       lastReviewedAt: next.lastReviewedAt,
+      reviewCount: 1,
     })
     .returning();
 
@@ -202,6 +204,7 @@ export async function upsertPracticeProblemProgress(
         intervalDays: next.intervalDays,
         dueAt: next.dueAt,
         lastReviewedAt: next.lastReviewedAt,
+        completionCount: existing.completionCount + 1,
       })
       .where(eq(practiceProblemProgress.id, existing.id))
       .returning();
@@ -218,6 +221,7 @@ export async function upsertPracticeProblemProgress(
       intervalDays: next.intervalDays,
       dueAt: next.dueAt,
       lastReviewedAt: next.lastReviewedAt,
+      completionCount: 1,
     })
     .returning();
 

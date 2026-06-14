@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PrepChoiceButton } from "@/components/prep/prep-choice-button";
+import { SessionProgress } from "@/components/prep/session-progress";
 import { cn } from "@/lib/utils";
 
 type DrillChoice = {
@@ -164,8 +165,9 @@ export function PrepDrillSession({ topicSlug }: PrepDrillSessionProps) {
   if (loading) {
     return (
       <Card>
-        <CardContent className="py-16 text-center text-sm text-[var(--muted)]">
-          Loading drill...
+        <CardContent className="space-y-3 py-16">
+          <div className="mx-auto h-1 max-w-xs animate-pulse rounded-full bg-black/[0.06]" />
+          <p className="text-center text-sm text-[var(--muted)]">Loading drill...</p>
         </CardContent>
       </Card>
     );
@@ -222,9 +224,7 @@ export function PrepDrillSession({ topicSlug }: PrepDrillSessionProps) {
 
   return (
     <div className="space-y-4">
-      <Badge variant="secondary">
-        {index + 1} / {questions.length}
-      </Badge>
+      <SessionProgress current={index} total={questions.length} />
 
       <Card>
         <CardContent className="space-y-4 p-6">
@@ -243,23 +243,14 @@ export function PrepDrillSession({ topicSlug }: PrepDrillSessionProps) {
           const isCorrect = feedback?.correctChoiceId === choice.id;
 
           return (
-            <button
+            <PrepChoiceButton
               key={choice.id}
-              type="button"
+              label={choice.label}
               disabled={Boolean(feedback) || submitting}
+              correct={Boolean(feedback && isCorrect)}
+              incorrect={Boolean(feedback && isSelected && !isCorrect)}
               onClick={() => submitAnswer(choice.id)}
-              className={cn(
-                "w-full rounded-[var(--radius-sm)] border px-4 py-3 text-left text-sm transition-colors",
-                "border-black/[0.08] bg-white hover:bg-black/[0.02] disabled:cursor-default",
-                feedback && isCorrect && "border-[var(--accent)] bg-[var(--accent-soft)]",
-                feedback &&
-                  isSelected &&
-                  !isCorrect &&
-                  "border-[var(--destructive)] bg-[var(--destructive-bg)]",
-              )}
-            >
-              {choice.label}
-            </button>
+            />
           );
         })}
       </div>

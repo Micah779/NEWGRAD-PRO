@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PrepActivityHeatmap } from "@/components/prep/prep-activity-heatmap";
 
 type TopicStat = {
   slug: string;
@@ -14,11 +15,25 @@ type TopicStat = {
   practiceAccuracy: number | null;
 };
 
+type LifetimeStats = {
+  cardReviews: number;
+  problemsCompleted: number;
+  drillsAnswered: number;
+  activeDays: number;
+};
+
+type ActivityDay = {
+  date: string;
+  active: boolean;
+};
+
 type PrepDashboardProps = {
   totalCards: number;
   dueCount: number;
   practiceDueCount: number;
   streak: number;
+  lifetimeStats: LifetimeStats;
+  activityHeatmap: ActivityDay[];
   topicStats: TopicStat[];
 };
 
@@ -27,8 +42,15 @@ export function PrepDashboard({
   dueCount,
   practiceDueCount,
   streak,
+  lifetimeStats,
+  activityHeatmap,
   topicStats,
 }: PrepDashboardProps) {
+  const hasLifetimeActivity =
+    lifetimeStats.cardReviews > 0 ||
+    lifetimeStats.problemsCompleted > 0 ||
+    lifetimeStats.drillsAnswered > 0;
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -90,6 +112,68 @@ export function PrepDashboard({
           <Link href="/prep/drill">Drill patterns</Link>
         </Button>
       </div>
+
+      {hasLifetimeActivity ? (
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold tracking-tight text-[var(--foreground)]">
+            Lifetime
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Card>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                  Flashcards reviewed
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold tabular-nums">
+                  {lifetimeStats.cardReviews}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                  Problems completed
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold tabular-nums">
+                  {lifetimeStats.problemsCompleted}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                  Drills answered
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold tabular-nums">
+                  {lifetimeStats.drillsAnswered}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-1">
+                <CardTitle className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                  Active days
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold tabular-nums">
+                  {lifetimeStats.activeDays}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      ) : null}
+
+      {activityHeatmap.some((day) => day.active) ? (
+        <PrepActivityHeatmap days={activityHeatmap} />
+      ) : null}
 
       <div className="space-y-3">
         <h2 className="text-sm font-semibold tracking-tight text-[var(--foreground)]">

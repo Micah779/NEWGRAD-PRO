@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PracticeStepPipeline } from "@/components/prep/practice-step-pipeline";
+import { PrepChoiceButton } from "@/components/prep/prep-choice-button";
+import { SessionProgress } from "@/components/prep/session-progress";
 import { cn } from "@/lib/utils";
 import type { ReviewGrade } from "@/lib/srs";
 
@@ -58,6 +60,7 @@ export function PrepPracticeSession({ topicSlug }: PrepPracticeSessionProps) {
   const [stage2Feedback, setStage2Feedback] = useState<Stage2Feedback | null>(null);
   const [patternCorrect, setPatternCorrect] = useState(false);
   const [sessionStats, setSessionStats] = useState({ correct: 0, total: 0 });
+  const [combo, setCombo] = useState(0);
   const [complete, setComplete] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<ReviewGrade | null>(null);
 
@@ -66,6 +69,7 @@ export function PrepPracticeSession({ topicSlug }: PrepPracticeSessionProps) {
     setError(null);
     setComplete(false);
     setSessionStats({ correct: 0, total: 0 });
+    setCombo(0);
     setIndex(0);
     resetProblemState();
 
@@ -188,6 +192,7 @@ export function PrepPracticeSession({ topicSlug }: PrepPracticeSessionProps) {
         correct: current.correct + (bothCorrect ? 1 : 0),
         total: current.total + 1,
       }));
+      setCombo((current) => (bothCorrect ? current + 1 : 0));
       setStage2Feedback({ ...data, selectedChoiceId: choiceId });
       setSelectedGrade(data.suggestedGrade);
       setStep("grade");
@@ -271,8 +276,9 @@ export function PrepPracticeSession({ topicSlug }: PrepPracticeSessionProps) {
   if (loading) {
     return (
       <Card>
-        <CardContent className="py-16 text-center text-sm text-[var(--muted)]">
-          Loading problems...
+        <CardContent className="space-y-3 py-16">
+          <div className="mx-auto h-1 max-w-xs animate-pulse rounded-full bg-black/[0.06]" />
+          <p className="text-center text-sm text-[var(--muted)]">Loading problems...</p>
         </CardContent>
       </Card>
     );
@@ -326,17 +332,19 @@ export function PrepPracticeSession({ topicSlug }: PrepPracticeSessionProps) {
   }
 
   const problem = problems[index];
-  const stepLabel = step === "pattern" ? "Step 1 of 2" : "Step 2 of 2";
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Badge variant="secondary">
-          {index + 1} / {problems.length}
-        </Badge>
-        {step !== "grade" ? (
-          <Badge variant="outline">{stepLabel}</Badge>
-        ) : null}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <SessionProgress current={index} total={problems.length} className="flex-1" />
+          {combo >= 2 ? (
+            <span className="shrink-0 text-xs font-semibold tabular-nums text-[var(--accent)]">
+              {combo} streak
+            </span>
+          ) : null}
+        </div>
+        <PracticeStepPipeline step={step} />
       </div>
 
       {step === "pattern" ? (
@@ -363,6 +371,7 @@ export function PrepPracticeSession({ topicSlug }: PrepPracticeSessionProps) {
             <FeedbackCard
               correct={stage1Feedback.correct}
               explanation={stage1Feedback.explanation}
+              almost={!stage1Feedback.correct}
             />
           ) : null}
         </>
@@ -371,7 +380,7 @@ export function PrepPracticeSession({ topicSlug }: PrepPracticeSessionProps) {
       {step === "complexity" || step === "grade" ? (
         <>
           {implementationCode ? (
-            <Card>
+            <Card className="transition-all duration-300">
               <CardContent className="space-y-3 p-6">
                 <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
                   Implementation
@@ -466,21 +475,14 @@ function ChoiceList({
           !feedback.correct;
 
         return (
-          <button
+          <PrepChoiceButton
             key={choice.id}
-            type="button"
+            label={choice.label}
             disabled={disabled}
+            correct={Boolean(feedback && isCorrect)}
+            incorrect={Boolean(isSelectedWrong)}
             onClick={() => onSelect(choice.id)}
-            className={cn(
-              "w-full rounded-[var(--radius-sm)] border px-4 py-3 text-left text-sm transition-colors",
-              "border-black/[0.08] bg-white hover:bg-black/[0.02] disabled:cursor-default",
-              feedback && isCorrect && "border-[var(--accent)] bg-[var(--accent-soft)]",
-              isSelectedWrong &&
-                "border-[var(--destructive)] bg-[var(--destructive-bg)]",
-            )}
-          >
-            {choice.label}
-          </button>
+          />
         );
       })}
     </div>
@@ -490,21 +492,25 @@ function ChoiceList({
 function FeedbackCard({
   correct,
   explanation,
+  almost,
 }: {
   correct: boolean;
   explanation: string;
+  almost?: boolean;
 }) {
   return (
     <Card
       className={cn(
         correct
           ? "border-[var(--accent)]/30 bg-[var(--accent-soft)]"
-          : "border-[var(--destructive)]/20 bg-[var(--destructive-bg)]",
+          : almost
+            ? "border-[var(--warning)]/30 bg-[var(--warning-bg)]"
+            : "border-[var(--destructive)]/20 bg-[var(--destructive-bg)]",
       )}
     >
       <CardContent className="space-y-2 p-4">
         <p className="text-sm font-medium text-[var(--foreground)]">
-          {correct ? "Correct" : "Not quite"}
+          {correct ? "Correct" : almost ? "Almost" : "Not quite"}
         </p>
         <p className="text-sm leading-relaxed text-[var(--muted)]">{explanation}</p>
       </CardContent>

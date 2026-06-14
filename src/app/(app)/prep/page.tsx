@@ -16,6 +16,13 @@ export default async function PrepPage() {
         dueCount: 0,
         practiceDueCount: 0,
         streak: 0,
+        lifetimeStats: {
+          cardReviews: 0,
+          problemsCompleted: 0,
+          drillsAnswered: 0,
+          activeDays: 0,
+        },
+        activityHeatmap: [],
         topicStats: [],
       };
 

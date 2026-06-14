@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { SessionProgress } from "@/components/prep/session-progress";
+import { previewGradeIntervals } from "@/lib/prep-intervals";
 import type { ReviewGrade } from "@/lib/srs";
+import { cn } from "@/lib/utils";
 
 type ReviewCard = {
   id: string;
@@ -15,6 +17,9 @@ type ReviewCard = {
   topic: string;
   front: string;
   back: string;
+  reps: number;
+  ease: number;
+  intervalDays: number;
 };
 
 type SessionStats = {
@@ -29,6 +34,13 @@ type PrepReviewSessionProps = {
 };
 
 const EMPTY_STATS: SessionStats = { again: 0, hard: 0, good: 0, easy: 0 };
+
+const GRADE_OPTIONS: { grade: ReviewGrade; label: string; variant: "outline" | "default" | "secondary" }[] = [
+  { grade: "again", label: "Again", variant: "outline" },
+  { grade: "hard", label: "Hard", variant: "outline" },
+  { grade: "good", label: "Good", variant: "default" },
+  { grade: "easy", label: "Easy", variant: "secondary" },
+];
 
 export function PrepReviewSession({ topicSlug }: PrepReviewSessionProps) {
   const router = useRouter();
@@ -187,11 +199,22 @@ export function PrepReviewSession({ topicSlug }: PrepReviewSessionProps) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [cards.length, complete, flipped, gradeCard, grading, loading]);
 
+  const currentCard = cards[index];
+  const gradeIntervals = useMemo(() => {
+    if (!currentCard) return null;
+    return previewGradeIntervals({
+      reps: currentCard.reps,
+      ease: currentCard.ease,
+      intervalDays: currentCard.intervalDays,
+    });
+  }, [currentCard]);
+
   if (loading) {
     return (
       <Card>
-        <CardContent className="py-16 text-center text-sm text-[var(--muted)]">
-          Loading cards...
+        <CardContent className="space-y-3 py-16">
+          <div className="mx-auto h-1 max-w-xs animate-pulse rounded-full bg-black/[0.06]" />
+          <p className="text-center text-sm text-[var(--muted)]">Loading cards...</p>
         </CardContent>
       </Card>
     );
@@ -245,62 +268,69 @@ export function PrepReviewSession({ topicSlug }: PrepReviewSessionProps) {
     );
   }
 
-  const card = cards[index];
+  const card = currentCard!;
 
   return (
     <div className="space-y-4">
-      <Badge variant="secondary">
-        {index + 1} / {cards.length}
-      </Badge>
+      <SessionProgress current={index} total={cards.length} />
 
       <button
         type="button"
         onClick={() => setFlipped((value) => !value)}
-        className="w-full text-left"
+        className="group w-full text-left [perspective:1000px]"
       >
-        <Card className="min-h-[220px] transition-colors active:bg-black/[0.01]">
-          <CardContent className="flex min-h-[220px] flex-col justify-center p-6">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
-              {flipped ? "Answer" : "Prompt"}
-            </p>
-            <p className="text-[15px] leading-relaxed text-[var(--foreground)]">
-              {flipped ? card.back : card.front}
-            </p>
-            <p className="mt-6 text-xs text-[var(--muted)]">
-              {flipped ? "1–4 to grade" : "Tap or press Space to flip"}
-            </p>
-          </CardContent>
-        </Card>
+        <div
+          className={cn(
+            "relative min-h-[220px] transition-transform duration-300 [transform-style:preserve-3d]",
+            flipped && "[transform:rotateY(180deg)]",
+          )}
+        >
+          <Card className="absolute inset-0 min-h-[220px] [backface-visibility:hidden]">
+            <CardContent className="flex min-h-[220px] flex-col justify-center p-6">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                Prompt
+              </p>
+              <p className="text-[15px] leading-relaxed text-[var(--foreground)]">
+                {card.front}
+              </p>
+              <p className="mt-6 text-xs text-[var(--muted)]">
+                Tap or press Space to flip
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="absolute inset-0 min-h-[220px] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+            <CardContent className="flex min-h-[220px] flex-col justify-center p-6">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                Answer
+              </p>
+              <p className="text-[15px] leading-relaxed text-[var(--foreground)]">
+                {card.back}
+              </p>
+              <p className="mt-6 text-xs text-[var(--muted)]">1–4 to grade</p>
+            </CardContent>
+          </Card>
+        </div>
       </button>
 
       {error ? <p className="text-sm text-[var(--destructive)]">{error}</p> : null}
 
       {flipped ? (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <Button
-            variant="outline"
-            disabled={grading}
-            onClick={() => gradeCard("again")}
-          >
-            Again
-          </Button>
-          <Button
-            variant="outline"
-            disabled={grading}
-            onClick={() => gradeCard("hard")}
-          >
-            Hard
-          </Button>
-          <Button disabled={grading} onClick={() => gradeCard("good")}>
-            Good
-          </Button>
-          <Button
-            variant="secondary"
-            disabled={grading}
-            onClick={() => gradeCard("easy")}
-          >
-            Easy
-          </Button>
+          {GRADE_OPTIONS.map(({ grade, label, variant }) => (
+            <Button
+              key={grade}
+              variant={variant}
+              disabled={grading}
+              className="flex flex-col gap-0.5 py-2.5 h-auto"
+              onClick={() => gradeCard(grade)}
+            >
+              <span>{label}</span>
+              <span className="text-[10px] font-normal opacity-70">
+                {gradeIntervals?.[grade]}
+              </span>
+            </Button>
+          ))}
         </div>
       ) : (
         <Button className="w-full" onClick={() => setFlipped(true)}>
